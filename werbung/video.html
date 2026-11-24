@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Retail Shop LGLL – Werbevideo</title>
+<style>
+  /* Werbevideo 1080×1920 (9:16). Jede Szene ist eine Ebene, die von unten über die vorige wischt.
+     Alle Bewegungen hängen nur von der Zeit t ab (render(t)), damit Bild für Bild gerendert werden kann. */
+  @font-face { font-family: "IS"; src: url(fonts/InstrumentSerif-Regular.ttf); }
+  @font-face { font-family: "IS"; font-style: italic; src: url(fonts/InstrumentSerif-Italic.ttf); }
+  @font-face { font-family: "HG"; font-weight: 400; src: url(fonts/HankenGrotesk-400.ttf); }
+  @font-face { font-family: "HG"; font-weight: 500; src: url(fonts/HankenGrotesk-500.ttf); }
+  @font-face { font-family: "HG"; font-weight: 600; src: url(fonts/HankenGrotesk-600.ttf); }
+  :root { --black: #0b0b0b; --white: #ffffff; --grey: #8c8c8c; --red: #d52b1e; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--black); }
+  body { font-family: "HG", sans-serif; -webkit-font-smoothing: antialiased; }
+  .scene { position: absolute; inset: 0; overflow: hidden; }
+  .dark { background: var(--black); color: var(--white); }
+  .light { background: var(--white); color: var(--black); }
+  .mask { overflow: hidden; display: block; }
+  .mask > span { display: block; will-change: transform; }
+  .serif { font-family: "IS", serif; font-weight: 400; letter-spacing: -.015em; }
+  .label { font-family: "HG"; font-weight: 500; font-size: 30px; letter-spacing: .32em; text-transform: uppercase; }
+  .center { position: absolute; left: 0; right: 0; text-align: center; }
+
+  /* 1 – Logo */
+  #s1 .word { top: 690px; font-size: 300px; line-height: 1; display: flex; justify-content: center; gap: 34px; }
+  #s1 .word .mask { padding-bottom: 20px; }
+  #s1 .rule { position: absolute; top: 1040px; left: 270px; width: 540px; height: 3px; background: var(--white); transform-origin: left; }
+  #s1 .sub { top: 1080px; font-size: 44px; }
+
+  /* 2 – Aussagen */
+  #s2 .eyebrow { position: absolute; top: 420px; left: 96px; color: #6b6b6b; }
+  #s2 .lines { position: absolute; top: 660px; left: 90px; font-size: 176px; line-height: 1.02; }
+  #s2 .lines em { font-style: italic; }
+  #s2 .note { position: absolute; top: 1390px; left: 96px; width: 760px; font-size: 40px; line-height: 1.45; color: #444; }
+
+  /* 3 – Produkte */
+  #s3 .eyebrow { position: absolute; top: 150px; left: 96px; color: var(--grey); }
+  #s3 .counter { position: absolute; top: 150px; right: 96px; color: var(--grey); font-variant-numeric: tabular-nums; }
+  .slide { position: absolute; inset: 0; }
+  .slide .pimg { position: absolute; top: 230px; left: 140px; width: 800px; height: 1000px; overflow: hidden; background: #1a1a1a; }
+  .slide .pimg img { width: 100%; height: 100%; object-fit: cover; display: block; transform-origin: center; }
+  .slide .ptxt { position: absolute; top: 1280px; left: 140px; right: 140px; }
+  .slide .tag { font-size: 26px; color: var(--grey); margin-bottom: 18px; }
+  .slide .name { font-size: 92px; line-height: 1.05; padding-bottom: 8px; }
+  .slide .price { font-family: "HG"; font-weight: 500; font-size: 58px; margin-top: 18px; font-variant-numeric: tabular-nums; }
+
+  /* 4 – Preis */
+  #s4 .pre { top: 560px; color: #6b6b6b; font-size: 34px; }
+  #s4 .big { top: 640px; font-size: 330px; line-height: 1; }
+  #s4 .big .mask { padding-bottom: 30px; }
+  #s4 .cats { position: absolute; top: 1150px; left: 190px; right: 190px; }
+  #s4 .cat { display: flex; justify-content: space-between; align-items: baseline; padding: 26px 0; border-top: 2px solid var(--black); font-size: 64px; }
+  #s4 .cat small { font-family: "HG"; font-size: 30px; color: #6b6b6b; letter-spacing: .02em; }
+  #s4 .cat .mask { width: 100%; }
+  #s4 .cat .mask > span { display: flex; justify-content: space-between; align-items: baseline; }
+
+  /* 5 – Schweiz */
+  #s5 .flag { position: absolute; top: 380px; left: 50%; width: 260px; height: 260px; margin-left: -130px; background: var(--red); }
+  #s5 .flag i { position: absolute; left: 50%; top: 50%; background: var(--white); }
+  #s5 .flag .h { width: 162px; height: 49px; margin: -24.5px 0 0 -81px; }
+  #s5 .flag .v { width: 49px; height: 162px; margin: -81px 0 0 -24.5px; }
+  #s5 .head { top: 780px; font-size: 150px; line-height: 1.02; }
+  #s5 .head .mask { padding-bottom: 10px; }
+  #s5 .sub { top: 1250px; font-size: 30px; color: var(--grey); }
+
+  /* 6 – Schluss */
+  #s6 .word { top: 520px; font-size: 220px; line-height: 1; display: flex; justify-content: center; gap: 24px; }
+  #s6 .word .mask { padding-bottom: 14px; }
+  #s6 .rule { position: absolute; top: 790px; left: 330px; width: 420px; height: 3px; background: var(--white); transform-origin: center; }
+  #s6 .sub { top: 822px; font-size: 34px; }
+  #s6 .cta { top: 1040px; font-size: 104px; line-height: 1.05; }
+  #s6 .url { position: absolute; top: 1240px; left: 50%; transform: translateX(-50%); white-space: nowrap;
+             padding: 30px 44px; border: 2px solid var(--white); font-size: 40px; font-weight: 500; letter-spacing: .01em; }
+  #s6 .meta { top: 1410px; font-size: 26px; color: var(--grey); }
+  #s6 .meta b { display: inline-block; width: 26px; height: 26px; background: var(--red); vertical-align: -4px; margin-right: 14px; position: relative; }
+  #s6 .meta b::before, #s6 .meta b::after { content: ""; position: absolute; left: 50%; top: 50%; background: var(--white); transform: translate(-50%, -50%); }
+  #s6 .meta b::before { width: 16px; height: 5px; }
+  #s6 .meta b::after { width: 5px; height: 16px; }
+  #fade { position: absolute; inset: 0; background: var(--black); opacity: 0; pointer-events: none; }
+</style>
+</head>
+<body>
+
+<!-- 1 Logo -->
+<section class="scene dark" id="s1">
+  <div class="center word serif" id="s1word"></div>
+  <div class="rule" id="s1rule"></div>
+  <div class="center sub label" id="s1sub">Retail Shop</div>
+</section>
+
+<!-- 2 Aussagen -->
+<section class="scene light" id="s2">
+  <div class="eyebrow label">Retail Shop LGLL</div>
+  <div class="lines serif">
+    <span class="mask"><span>Gute Kleidung.</span></span>
+    <span class="mask"><span>Gute Schuhe.</span></span>
+    <span class="mask"><span><em>Kleine</em> Preise.</span></span>
+  </div>
+  <div class="note"><span class="mask"><span>Shirts, Hosen und Sneaker für Gross und Klein.</span></span></div>
+</section>
+
+<!-- 3 Produkte -->
+<section class="scene dark" id="s3">
+  <div class="eyebrow label">Neu im Shop</div>
+  <div class="counter label" id="counter"></div>
+  <div id="slides"></div>
+</section>
+
+<!-- 4 Preis -->
+<section class="scene light" id="s4">
+  <div class="center pre label"><span class="mask"><span>Preise ab</span></span></div>
+  <div class="center big serif"><span class="mask"><span>CHF 10.–</span></span></div>
+  <div class="cats serif" id="cats"></div>
+</section>
+
+<!-- 5 Schweiz -->
+<section class="scene dark" id="s5">
+  <div class="flag" id="flag"><i class="h"></i><i class="v"></i></div>
+  <div class="center head serif">
+    <span class="mask"><span>Wir liefern in</span></span>
+    <span class="mask"><span>die ganze Schweiz.</span></span>
+  </div>
+  <div class="center sub label"><span class="mask"><span>Lieferung nur innerhalb der Schweiz</span></span></div>
+</section>
+
+<!-- 6 Schluss -->
+<section class="scene dark" id="s6">
+  <div class="center word serif" id="s6word"></div>
+  <div class="rule" id="s6rule"></div>
+  <div class="center sub label" id="s6sub">Retail Shop</div>
+  <div class="center cta serif"><span class="mask"><span>Jetzt bestellen.</span></span></div>
+  <div class="url" id="url">zuljiamar-pixel.github.io/Lamar-Ai</div>
+  <div class="center meta label" id="meta"><b></b>Nur Lieferung in der Schweiz</div>
+</section>
+
+<div id="fade"></div>
+
+<script>
+  const FPS = 30, DURATION = 25;
+  const B = "../website/bilder/";
+  const PRODUKTE = [
+    { tag: "Unisex",  name: "Langarmshirt „Scream“",       preis: "CHF 15.–", bild: "langarmshirt-scream-schwarz.jpg" },
+    { tag: "Schuhe",  name: "Sneaker „Street“",            preis: "CHF 30.–", bild: "sneaker-schwarz.jpg" },
+    { tag: "Kinder",  name: "Jogginghose „Flower“",        preis: "CHF 15.–", bild: "jogginghose-flower-schwarz.jpg" },
+    { tag: "Schuhe",  name: "Skate-Sneaker „Rope“",        preis: "CHF 35.–", bild: "skate-sneaker-schwarz.jpg" },
+    { tag: "Kinder",  name: "Langarmshirt „Have passion“", preis: "CHF 10.–", bild: "langarmshirt-have-passion.jpg" },
+    { tag: "Kinder",  name: "Weite Hose „Extraordinary“",  preis: "CHF 10.–", bild: "hose-extraordinary-kinder.jpg" },
+  ];
+  const KATS = [["Schuhe", "ab CHF 30.–"], ["Shirts", "ab CHF 10.–"], ["Hosen", "ab CHF 10.–"]];
+
+  // Zeitplan (Sekunden): Start jeder Szene; die Wisch-Animation endet am Start.
+  const T = { s1: 0, s2: 3.2, s3: 7.4, s4: 16.0, s5: 19.4, s6: 22.0 };
+  const WIPE = 0.7, SLIDE = 1.35;
+
+  // Helfer
+  const clamp = x => Math.min(1, Math.max(0, x));
+  const seg = (t, a, b) => clamp((t - a) / (b - a));
+  const eOut = x => x === 1 ? 1 : 1 - Math.pow(2, -10 * x);          // expo out
+  const eInOut = x => x < .5 ? 8 * x ** 4 : 1 - Math.pow(-2 * x + 2, 4) / 2; // quart in-out
+  const $ = s => document.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  // Masken-Text: von unten hinein (in) und nach oben hinaus (out)
+  function rise(el, t, a, dur = .8, out = null, outDur = .5) {
+    let y = (1 - eOut(seg(t, a, a + dur))) * 112;
+    if (out !== null) y -= eInOut(seg(t, out, out + outDur)) * 112;
+    el.style.transform = `translateY(${y.toFixed(3)}%)`;
+  }
+
+  // Aufbau
+  const letters = w => [...w].map(c => `<span class="mask"><span>${c}</span></span>`).join("");
+  $("#s1word").innerHTML = letters("LGLL");
+  $("#s6word").innerHTML = letters("LGLL");
+  $("#slides").innerHTML = PRODUKTE.map(p => `
+    <div class="slide">
+      <div class="pimg"><img src="${B + p.bild}" alt=""></div>
+      <div class="ptxt">
+        <div class="tag label mask"><span>${p.tag}</span></div>
+        <div class="name serif mask"><span>${p.name}</span></div>
+        <div class="price mask"><span>${p.preis}</span></div>
+      </div>
+    </div>`).join("");
+  $("#cats").innerHTML = KATS.map(([k, v]) => `<div class="cat"><span class="mask"><span>${k}<small>${v}</small></span></span></div>`).join("");
+
+  const scenes = ["s1", "s2", "s3", "s4", "s5", "s6"];
+
+  function render(t) {
+    // Szenen-Wischer: neue Szene schiebt sich von unten über die alte
+    scenes.forEach((id, i) => {
+      const el = document.getElementById(id);
+      const start = T[id];
+      const next = scenes[i + 1] ? T[scenes[i + 1]] : Infinity;
+      if (t < start - WIPE || t > next + 0.05) { el.style.display = "none"; return; }
+      el.style.display = "block";
+      const p = i === 0 ? 1 : eInOut(seg(t, start - WIPE, start));
+      el.style.clipPath = `inset(${((1 - p) * 100).toFixed(3)}% 0 0 0)`;
+      el.style.zIndex = i + 1;
+      // alte Szene bewegt sich beim Überdecken leicht nach oben
+      const cover = scenes[i + 1] ? eInOut(seg(t, next - WIPE, next)) : 0;
+      el.style.transform = `translateY(${(-cover * 120).toFixed(2)}px)`;
+    });
+
+    // 1 – Logo
+    $$("#s1word .mask > span").forEach((s, i) => rise(s, t, .25 + i * .09, 1.0));
+    $("#s1rule").style.transform = `scaleX(${eOut(seg(t, 1.05, 1.9)).toFixed(4)})`;
+    const sub = eOut(seg(t, 1.35, 2.4));
+    $("#s1sub").style.opacity = sub;
+    $("#s1sub").style.letterSpacing = `${(0.7 - 0.38 * sub).toFixed(4)}em`;
+
+    // 2 – Aussagen
+    $$("#s2 .lines .mask > span").forEach((s, i) => rise(s, t, T.s2 + .05 + i * .38, .9));
+    rise($("#s2 .note .mask > span"), t, T.s2 + 1.4, .9);
+
+    // 3 – Produkte
+    const slides = $$(".slide");
+    slides.forEach((sl, i) => {
+      const a = T.s3 + i * SLIDE;           // Start dieser Folie
+      const b = a + SLIDE;                  // nächste Folie beginnt
+      const last = i === slides.length - 1;
+      if (t < a - .6 || (!last && t > b + .6)) { sl.style.display = "none"; return; }
+      sl.style.display = "block";
+      sl.style.zIndex = i + 1;
+      const img = sl.querySelector(".pimg"), im = sl.querySelector("img");
+      if (i === 0) {
+        img.style.clipPath = "inset(0 0 0 0)";
+        const p = eOut(seg(t, a - .1, a + 1.1));
+        im.style.transform = `scale(${(1.12 - .12 * p).toFixed(4)})`;
+      } else {
+        const p = eInOut(seg(t, a - .55, a + .15));
+        img.style.clipPath = `inset(0 0 0 ${((1 - p) * 100).toFixed(3)}%)`;
+        const z = eOut(seg(t, a - .55, a + 1.2));
+        im.style.transform = `scale(${(1.14 - .14 * z).toFixed(4)})`;
+      }
+      // Text
+      const out = last ? null : b - .5;
+      $$(".ptxt .mask > span", sl).forEach((s, k) => rise(s, t, a - .14 + k * .07, .8, out === null ? null : out + k * .03, .38));
+    });
+    const idx = Math.min(PRODUKTE.length, Math.max(1, Math.floor((t - T.s3 + .3) / SLIDE) + 1));
+    $("#counter").textContent = `${String(idx).padStart(2, "0")} / ${String(PRODUKTE.length).padStart(2, "0")}`;
+
+    // 4 – Preis
+    rise($("#s4 .pre .mask > span"), t, T.s4 - .1, .8);
+    rise($("#s4 .big .mask > span"), t, T.s4 + .05, 1.0);
+    $$("#s4 .cat").forEach((c, i) => {
+      const a = T.s4 + .7 + i * .22;
+      c.style.borderTopColor = `rgba(11,11,11,${eOut(seg(t, a - .1, a + .5)).toFixed(3)})`;
+      rise(c.querySelector(".mask > span"), t, a, .8);
+    });
+
+    // 5 – Schweiz
+    const fl = eOut(seg(t, T.s5 - .15, T.s5 + .75));
+    $("#flag").style.transform = `scale(${(.6 + .4 * fl).toFixed(4)})`;
+    $("#flag").style.opacity = fl;
+    $("#flag .h").style.transform = `scaleX(${eOut(seg(t, T.s5 + .25, T.s5 + 1.0)).toFixed(4)})`;
+    $("#flag .v").style.transform = `scaleY(${eOut(seg(t, T.s5 + .35, T.s5 + 1.1)).toFixed(4)})`;
+    $$("#s5 .head .mask > span").forEach((s, i) => rise(s, t, T.s5 + .2 + i * .14, .9));
+    rise($("#s5 .sub .mask > span"), t, T.s5 + .75, .8);
+
+    // 6 – Schluss
+    $$("#s6word .mask > span").forEach((s, i) => rise(s, t, T.s6 - .1 + i * .07, .9));
+    $("#s6rule").style.transform = `scaleX(${eOut(seg(t, T.s6 + .35, T.s6 + 1.1)).toFixed(4)})`;
+    const s6 = eOut(seg(t, T.s6 + .45, T.s6 + 1.3));
+    $("#s6sub").style.opacity = s6;
+    $("#s6sub").style.letterSpacing = `${(0.6 - 0.28 * s6).toFixed(4)}em`;
+    rise($("#s6 .cta .mask > span"), t, T.s6 + .6, .9);
+    const u = eOut(seg(t, T.s6 + .95, T.s6 + 1.8));
+    $("#url").style.opacity = u;
+    $("#url").style.transform = `translateX(-50%) translateY(${((1 - u) * 30).toFixed(2)}px)`;
+    $("#meta").style.opacity = eOut(seg(t, T.s6 + 1.25, T.s6 + 2.0));
+
+    // Ausblenden am Ende
+    $("#fade").style.opacity = eInOut(seg(t, DURATION - .55, DURATION - .05)).toFixed(3);
+  }
+
+  window.render = render;
+  window.FPS = FPS; window.DURATION = DURATION;
+  window.ready = Promise.all([
+    document.fonts.ready,
+    ...[...document.images].map(img => img.complete ? 0 : new Promise(r => { img.onload = img.onerror = r; }))
+  ]).then(() => Promise.all(["IS", "HG"].map(f => document.fonts.load(`80px ${f}`))));
+  render(0);
+</script>
+</body>
+</html>
