@@ -74,6 +74,7 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    [hidden] { display: none !important; }
     html { scroll-behavior: smooth; scroll-padding-top: 80px; }
     body {
       background: var(--bg);
@@ -219,6 +220,18 @@
     .order-msg:empty { display: none; }
     .note { font-size: 12px; color: var(--grey); }
 
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: -24px 0 40px 240px; }
+    .filter {
+      font: inherit; font-size: 14px; padding: 9px 18px; cursor: pointer;
+      background: transparent; color: var(--fg); border: 1px solid var(--line2); border-radius: 999px;
+      transition: border-color .15s, background .15s, color .15s;
+    }
+    .filter:hover { border-color: var(--fg); }
+    .filter[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+    .filter .count { color: var(--grey); margin-left: 4px; font-variant-numeric: tabular-nums; }
+    .filter[aria-pressed="true"] .count { color: inherit; opacity: .6; }
+    .menu-sep { padding-left: 36px; border-left: 1px solid var(--line); }
+
     .empty {
       border: 1px solid var(--fg); padding: 90px 40px; text-align: center;
     }
@@ -250,6 +263,8 @@
       .fact { padding: 20px 0; border-bottom: 1px solid var(--line); }
       .range-list li { padding: 28px 0; gap: 8px; }
       .products-grid { margin-left: 0; max-width: none; }
+      .filters { margin-left: 0; margin-top: -16px; gap: 6px; }
+      .filter { font-size: 13px; padding: 7px 13px; }
       .contact-grid > :first-child { display: none; }
     }
     @media (max-width: 760px) {
@@ -266,6 +281,7 @@
       .menu.open { max-height: 400px; }
       .menu li a { display: block; padding: 18px 16px; border-top: 1px solid var(--line); font-size: 17px; }
       .menu a::after { display: none; }
+      .menu-sep { padding-left: 0; border-left: 0; }
       .hero { padding: 72px 0 72px; }
       section { padding: 80px 0; }
       .empty { padding: 64px 24px; }
@@ -287,9 +303,10 @@
         <span></span><span></span><span></span>
       </button>
       <ul class="menu" id="menu">
-        <li><a href="#ueber-uns">Über uns</a></li>
-        <li><a href="#sortiment">Sortiment</a></li>
-        <li><a href="#produkte">Produkte</a></li>
+        <li><a href="#schuhe">Schuhe</a></li>
+        <li><a href="#shirts">Shirts</a></li>
+        <li><a href="#hosen">Hosen</a></li>
+        <li class="menu-sep"><a href="#ueber-uns">Über uns</a></li>
         <li><a href="#kontakt">Kontakt</a></li>
       </ul>
     </nav>
@@ -357,6 +374,7 @@
           <div class="section-num">Produkte</div>
           <h2>Unsere Produkte.</h2>
         </div>
+        <div class="filters" id="filters" role="group" aria-label="Kategorie wählen"></div>
         <div id="products"></div>
       </div>
     </section>
@@ -403,6 +421,7 @@
     const produkte = [
       {
         name: "Langarmshirt „Have passion“",
+        typ: "Shirts",
         kategorie: "Kinder",
         beschreibung: "Raglan-Langarmshirt in Schwarz-Weiss. Vorne und auf beiden Ärmeln steht in Schreibschrift „Have passion and love for life“.",
         preis: "CHF 10.–",               // leer lassen = „Preis auf Anfrage“
@@ -413,6 +432,7 @@
       },
       {
         name: "Langarmshirt „Scream“",
+        typ: "Shirts",
         kategorie: "Unisex",
         beschreibung: "Oversize-Langarmshirt mit Freiheitsstatue-Print vorne und grossem „SCREAM“-Schriftzug auf beiden Ärmeln.",
         preis: "CHF 15.–",
@@ -430,6 +450,7 @@
       },
       {
         name: "Sneaker „Street“",
+        typ: "Schuhe",
         kategorie: "Schuhe",
         beschreibung: "Chunky Sneaker mit dicken Schnürsenkeln und Mesh-Einsätzen. Weite Passform.",
         preis: "CHF 30.–",
@@ -444,6 +465,7 @@
       },
       {
         name: "Skate-Sneaker „Rope“",
+        typ: "Schuhe",
         kategorie: "Schuhe",
         beschreibung: "Schwarzer Plateau-Sneaker im Skate-Look mit dicker Zunge und weissen Kordel-Schnürsenkeln.",
         preis: "CHF 35.–",
@@ -454,6 +476,7 @@
       },
       {
         name: "Weite Hose „Extraordinary“",
+        typ: "Hosen",
         kategorie: "Kinder",
         beschreibung: "Schwarze Hose mit weitem Bein und grossem weissem Graffiti-Schriftzug vorne.",
         preis: "CHF 10.–",
@@ -464,6 +487,7 @@
       },
       {
         name: "Jogginghose „Flower“",
+        typ: "Hosen",
         kategorie: "Kinder",
         beschreibung: "Weite Jogginghose mit Kirschblüten-Stickerei, „Flower“-Schriftzug, elastischem Bund und Kordelzug.",
         preis: "CHF 15.–",
@@ -550,6 +574,40 @@
         setHref();
       });
     }
+
+    // Kategorien (Schuhe / Shirts / Hosen)
+    const KATS = [["alle", "Alle"], ["schuhe", "Schuhe"], ["shirts", "Shirts"], ["hosen", "Hosen"]];
+    const filterBox = document.getElementById("filters");
+    if (produkte.length) {
+      filterBox.innerHTML = KATS.map(([id, label]) => {
+        const n = id === "alle" ? produkte.length : produkte.filter(p => (p.typ || "").toLowerCase() === id).length;
+        return n ? `<button type="button" class="filter" data-kat="${id}" aria-pressed="false">${label}<span class="count">${n}</span></button>` : "";
+      }).join("");
+    }
+    function zeigeKategorie(kat) {
+      if (!KATS.some(([id]) => id === kat)) kat = "alle";
+      filterBox.querySelectorAll(".filter").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.kat === kat)));
+      box.querySelectorAll(".product").forEach(card => {
+        const typ = (produkte[card.dataset.i].typ || "").toLowerCase();
+        card.hidden = kat !== "alle" && typ !== kat;
+      });
+    }
+    filterBox.addEventListener("click", e => {
+      const b = e.target.closest(".filter"); if (!b) return;
+      zeigeKategorie(b.dataset.kat);
+      try { history.replaceState(null, "", b.dataset.kat === "alle" ? "#produkte" : "#" + b.dataset.kat); } catch (_) {}
+    });
+    function vonHash(scroll) {
+      const h = location.hash.slice(1);
+      if (["schuhe", "shirts", "hosen"].includes(h)) {
+        zeigeKategorie(h);
+        if (scroll) document.getElementById("produkte").scrollIntoView({ behavior: "smooth" });
+      } else if (!h || h === "produkte") zeigeKategorie("alle");
+    }
+    window.addEventListener("hashchange", () => vonHash(true));
+    document.querySelectorAll('.menu a[href="#schuhe"], .menu a[href="#shirts"], .menu a[href="#hosen"]').forEach(a =>
+      a.addEventListener("click", () => { if (location.hash === a.getAttribute("href")) vonHash(true); }));
+    vonHash(true);
 
     // Handy-Menü
     const burger = document.querySelector(".burger");
