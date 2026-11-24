@@ -428,6 +428,20 @@
         hinweis: "Bild zeigt die Farbe Schwarz",
         bild: "bilder/langarmshirt-scream-schwarz.jpg"
       },
+      {
+        name: "Sneaker „Street“",
+        kategorie: "Schuhe",
+        beschreibung: "Chunky Sneaker mit dicken Schnürsenkeln und Mesh-Einsätzen. Weite Passform.",
+        preis: "CHF 30.–",
+        farben: [
+          { name: "Beige",   farbe: "#e6e1d6", bild: "bilder/sneaker-beige.jpg" },
+          { name: "Schwarz", farbe: "#111111", bild: "bilder/sneaker-schwarz.jpg" },
+          { name: "Bunt",    farbe: "conic-gradient(#1f4fbf 0 33%, #f2b632 0 66%, #d8253a 0)", bild: "bilder/sneaker-bunt.jpg" }
+        ],
+        groessenTitel: "Grösse (EU)",
+        groessen: ["38.5", "39.5", "40", "41", "42", "43", "43.5", "44.5", "45", "46"],
+        bild: "bilder/sneaker-schwarz.jpg"
+      },
     ];
 
     const EMAIL = "retailshoplgll@gmail.com";
@@ -453,7 +467,7 @@
             ${p.farben && p.farben.length ? `
               <div class="sizes-label" id="fl-${i}" data-base="Farbe">Farbe</div>
               <div class="sizes" role="group" aria-labelledby="fl-${i}" data-opt="Farbe">
-                ${p.farben.map(f => `<button type="button" class="size color" aria-pressed="false" data-value="${esc(f.name)}" aria-label="${esc(f.name)}" title="${esc(f.name)}"><span class="dot" style="background:${esc(f.farbe)}"></span></button>`).join("")}
+                ${p.farben.map(f => `<button type="button" class="size color" aria-pressed="false" data-value="${esc(f.name)}" ${f.bild ? `data-bild="${esc(f.bild)}"` : ""} aria-label="${esc(f.name)}" title="${esc(f.name)}"><span class="dot" style="background:${esc(f.farbe)}"></span></button>`).join("")}
               </div>` : ""}
             ${p.groessen && p.groessen.length ? `
               <div class="sizes-label" id="sl-${i}" data-base="${esc(p.groessenTitel || "Grösse")}">${esc(p.groessenTitel || "Grösse")}</div>
@@ -485,6 +499,8 @@
           btn.setAttribute("aria-pressed", "true");
           chosen[g.dataset.opt] = btn.dataset.value;
           const lab = document.getElementById(g.getAttribute("aria-labelledby"));
+          const img = card.querySelector(".img img");
+          if (btn.dataset.bild && img) img.src = btn.dataset.bild;
           lab.textContent = `${lab.dataset.base}: ${btn.dataset.value}`;
           const missing = groups.filter(x => !chosen[x.dataset.opt]).map(x => x.dataset.opt);
           msg.textContent = missing.length ? `Bitte noch ${missing.join(" und ")} wählen.` : "";
