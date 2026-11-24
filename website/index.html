@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lamar</title>
+  <meta name="description" content="Lamar – unser Geschäft, unser Sortiment, unsere Produkte.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --black: #0b0b0b;
+      --white: #ffffff;
+      --grey: #6b6b6b;
+      --line: #e4e4e4;
+      --soft: #f6f6f4;
+      --serif: "Instrument Serif", Georgia, serif;
+      --sans: "Hanken Grotesk", system-ui, sans-serif;
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+    body {
+      background: var(--white);
+      color: var(--black);
+      font-family: var(--sans);
+      font-size: 17px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    .wrap { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
+
+    /* ---------- Kopfzeile / Menü ---------- */
+    header {
+      position: sticky; top: 0; z-index: 10;
+      background: rgba(255,255,255,.94);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav { display: flex; align-items: center; justify-content: space-between; height: 72px; }
+    .logo { font-family: var(--serif); font-size: 30px; letter-spacing: -.01em; }
+    .menu { display: flex; gap: 36px; list-style: none; }
+    .menu a { font-size: 15px; position: relative; padding: 4px 0; }
+    .menu a::after {
+      content: ""; position: absolute; left: 0; bottom: 0;
+      width: 0; height: 1px; background: var(--black); transition: width .25s;
+    }
+    .menu a:hover::after { width: 100%; }
+    .burger {
+      display: none; background: none; border: 0; cursor: pointer;
+      width: 32px; height: 32px; position: relative;
+    }
+    .burger span {
+      position: absolute; left: 4px; right: 4px; height: 1.5px; background: var(--black);
+      transition: transform .25s, opacity .25s;
+    }
+    .burger span:nth-child(1) { top: 10px; }
+    .burger span:nth-child(2) { top: 16px; }
+    .burger span:nth-child(3) { top: 22px; }
+    .burger[aria-expanded="true"] span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+    .burger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    /* ---------- Start ---------- */
+    .hero { padding: 120px 0 110px; border-bottom: 1px solid var(--line); }
+    .eyebrow {
+      font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--grey);
+      margin-bottom: 28px;
+    }
+    .hero h1 {
+      font-family: var(--serif); font-weight: 400;
+      font-size: clamp(48px, 8.5vw, 112px); line-height: .98; letter-spacing: -.02em;
+      max-width: 11ch;
+    }
+    .hero h1 em { font-style: italic; }
+    .hero-bottom {
+      display: flex; justify-content: space-between; align-items: flex-end; gap: 40px;
+      margin-top: 56px; flex-wrap: wrap;
+    }
+    .hero p { max-width: 460px; color: #333; font-size: 18px; }
+    .btn {
+      display: inline-block; padding: 15px 30px; border: 1px solid var(--black);
+      background: var(--black); color: var(--white); font-size: 15px; font-weight: 500;
+      transition: background .2s, color .2s;
+    }
+    .btn:hover { background: var(--white); color: var(--black); }
+    .btn.ghost { background: transparent; color: var(--black); }
+    .btn.ghost:hover { background: var(--black); color: var(--white); }
+
+    /* ---------- Abschnitte ---------- */
+    section { padding: 110px 0; }
+    .section-head {
+      display: grid; grid-template-columns: 200px 1fr; gap: 40px; margin-bottom: 64px;
+    }
+    .section-num { font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--grey); padding-top: 14px; }
+    h2 {
+      font-family: var(--serif); font-weight: 400;
+      font-size: clamp(38px, 5vw, 64px); line-height: 1.05; letter-spacing: -.015em;
+    }
+
+    /* Über uns */
+    .about-body { display: grid; grid-template-columns: 200px 1fr 1fr; gap: 40px; }
+    .about-body p { color: #333; }
+    .facts {
+      grid-column: 2 / 4; display: grid; grid-template-columns: repeat(3, 1fr);
+      border-top: 1px solid var(--black); margin-top: 40px;
+    }
+    .fact { padding: 28px 24px 0 0; }
+    .fact strong { display: block; font-family: var(--serif); font-size: 26px; font-weight: 400; margin-bottom: 6px; }
+    .fact span { color: var(--grey); font-size: 15px; }
+
+    /* Sortiment */
+    .range { background: var(--soft); }
+    .range-list { list-style: none; border-top: 1px solid var(--black); }
+    .range-list li {
+      display: grid; grid-template-columns: 200px 1fr 1.2fr; gap: 40px; align-items: baseline;
+      padding: 34px 0; border-bottom: 1px solid #d6d6d2;
+    }
+    .range-list .idx { color: var(--grey); font-size: 14px; }
+    .range-list h3 { font-family: var(--serif); font-weight: 400; font-size: 34px; line-height: 1.1; }
+    .range-list p { color: #444; }
+
+    /* Produkte */
+    .products-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px 28px;
+    }
+    .product .img {
+      aspect-ratio: 4 / 5; background: var(--soft); margin-bottom: 18px; overflow: hidden;
+    }
+    .product .img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s; }
+    .product:hover .img img { transform: scale(1.03); }
+    .product .row { display: flex; justify-content: space-between; gap: 16px; }
+    .product h3 { font-size: 17px; font-weight: 500; }
+    .product .price { font-variant-numeric: tabular-nums; }
+    .product p { color: var(--grey); font-size: 15px; margin-top: 2px; }
+
+    .empty {
+      border: 1px solid var(--black); padding: 90px 40px; text-align: center;
+    }
+    .empty h3 { font-family: var(--serif); font-weight: 400; font-size: clamp(32px, 4vw, 48px); line-height: 1.1; margin-bottom: 16px; }
+    .empty p { color: var(--grey); max-width: 440px; margin: 0 auto 32px; }
+
+    /* Kontakt */
+    .contact { background: var(--black); color: var(--white); }
+    .contact .section-num { color: #8a8a8a; }
+    .contact-grid { display: grid; grid-template-columns: 200px 1fr 1fr 1fr; gap: 40px; }
+    .contact-grid h4 { font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: #8a8a8a; font-weight: 500; margin-bottom: 12px; }
+    .contact-grid p, .contact-grid a { color: #e8e8e8; }
+    .contact-grid a:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+    footer { background: var(--black); color: #8a8a8a; border-top: 1px solid #222; }
+    footer .wrap { display: flex; justify-content: space-between; padding-top: 28px; padding-bottom: 28px; font-size: 14px; flex-wrap: wrap; gap: 12px; }
+
+    /* ---------- Handy / Tablet ---------- */
+    @media (max-width: 900px) {
+      .section-head, .about-body, .range-list li, .contact-grid { grid-template-columns: 1fr; gap: 16px; }
+      .section-head { margin-bottom: 44px; }
+      .section-num { padding-top: 0; }
+      .about-body > :first-child { display: none; }
+      .facts { grid-column: auto; grid-template-columns: 1fr; margin-top: 24px; }
+      .fact { padding: 20px 0; border-bottom: 1px solid var(--line); }
+      .range-list li { padding: 28px 0; gap: 8px; }
+      .products-grid { grid-template-columns: repeat(2, 1fr); }
+      .contact-grid > :first-child { display: none; }
+    }
+    @media (max-width: 760px) {
+      body { font-size: 16px; }
+      .wrap { padding: 0 16px; }
+      .burger { display: block; }
+      .menu {
+        position: absolute; top: 72px; left: 0; right: 0;
+        flex-direction: column; gap: 0; background: var(--white);
+        border-bottom: 1px solid var(--line);
+        max-height: 0; overflow: hidden; transition: max-height .3s ease;
+      }
+      .menu.open { max-height: 400px; }
+      .menu li a { display: block; padding: 18px 16px; border-top: 1px solid var(--line); font-size: 17px; }
+      .menu a::after { display: none; }
+      .hero { padding: 72px 0 72px; }
+      section { padding: 80px 0; }
+      .empty { padding: 64px 24px; }
+      .products-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <nav class="wrap nav">
+      <a href="#start" class="logo">Lamar</a>
+      <button class="burger" aria-label="Menü öffnen" aria-expanded="false" aria-controls="menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="menu" id="menu">
+        <li><a href="#ueber-uns">Über uns</a></li>
+        <li><a href="#sortiment">Sortiment</a></li>
+        <li><a href="#produkte">Produkte</a></li>
+        <li><a href="#kontakt">Kontakt</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <!-- START -->
+    <section class="hero" id="start">
+      <div class="wrap">
+        <div class="eyebrow">Willkommen bei Lamar</div>
+        <h1>Gute Dinge, <em>einfach</em> gemacht.</h1>
+        <div class="hero-bottom">
+          <p>Hier steht ein kurzer Satz über euer Geschäft – wer ihr seid und was euch besonders macht. Kurz und ehrlich.</p>
+          <a href="#produkte" class="btn">Zu den Produkten</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ÜBER UNS -->
+    <section id="ueber-uns">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-num">01 — Über uns</div>
+          <h2>Wer wir sind und<br>wofür wir stehen.</h2>
+        </div>
+        <div class="about-body">
+          <div></div>
+          <p>Hier erzählt ihr eure Geschichte: Wie das Geschäft entstanden ist, wer dahintersteht und was euch antreibt. Zwei, drei Sätze reichen völlig.</p>
+          <p>Und hier, was Kunden bei euch erwartet – zum Beispiel Qualität, persönliche Beratung oder faire Preise. Schreibt so, wie ihr auch im Laden reden würdet.</p>
+          <div class="facts">
+            <div class="fact"><strong>Qualität</strong><span>Sorgfältig ausgewählt</span></div>
+            <div class="fact"><strong>Persönlich</strong><span>Direkter Kontakt zu uns</span></div>
+            <div class="fact"><strong>Fair</strong><span>Klare, ehrliche Preise</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SORTIMENT -->
+    <section class="range" id="sortiment">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-num">02 — Sortiment</div>
+          <h2>Was wir verkaufen.</h2>
+        </div>
+        <ul class="range-list">
+          <li>
+            <span class="idx">A</span>
+            <h3>Kategorie eins</h3>
+            <p>Kurze Beschreibung dieser Produktgruppe. Was gehört dazu, für wen ist es gedacht?</p>
+          </li>
+          <li>
+            <span class="idx">B</span>
+            <h3>Kategorie zwei</h3>
+            <p>Kurze Beschreibung dieser Produktgruppe. Was gehört dazu, für wen ist es gedacht?</p>
+          </li>
+          <li>
+            <span class="idx">C</span>
+            <h3>Kategorie drei</h3>
+            <p>Kurze Beschreibung dieser Produktgruppe. Was gehört dazu, für wen ist es gedacht?</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- PRODUKTE -->
+    <section id="produkte">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-num">03 — Produkte</div>
+          <h2>Unsere Produkte.</h2>
+        </div>
+        <div id="products"></div>
+      </div>
+    </section>
+
+    <!-- KONTAKT -->
+    <section class="contact" id="kontakt">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-num">04 — Kontakt</div>
+          <h2>Schreibt uns.<br>Wir antworten gern.</h2>
+        </div>
+        <div class="contact-grid">
+          <div></div>
+          <div>
+            <h4>E-Mail</h4>
+            <a href="mailto:hallo@beispiel.de">hallo@beispiel.de</a>
+          </div>
+          <div>
+            <h4>Telefon</h4>
+            <a href="tel:+490000000000">+49 000 000 000</a>
+          </div>
+          <div>
+            <h4>Adresse</h4>
+            <p>Musterstraße 1<br>12345 Musterstadt</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>© <span id="year"></span> Lamar</span>
+      <span>Impressum · Datenschutz</span>
+    </div>
+  </footer>
+
+  <script>
+    /* =========================================================
+       PRODUKTE
+       Hier kommen später eure Produkte rein. Solange die Liste
+       leer ist, zeigt die Seite automatisch „Bald verfügbar“.
+
+       Beispiel für ein Produkt (einfach kopieren und anpassen):
+       {
+         name: "Produktname",
+         beschreibung: "Kurze Beschreibung",
+         preis: "29,00 €",
+         bild: "bilder/produkt1.jpg"
+       },
+       ========================================================= */
+    const produkte = [
+      // Noch keine Produkte
+    ];
+
+    const box = document.getElementById("products");
+    const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+    if (produkte.length === 0) {
+      box.innerHTML = `
+        <div class="empty">
+          <h3>Bald verfügbar.</h3>
+          <p>Wir arbeiten gerade an unseren ersten Produkten. Schaut bald wieder vorbei – oder schreibt uns, wenn ihr Fragen habt.</p>
+          <a href="#kontakt" class="btn ghost">Kontakt aufnehmen</a>
+        </div>`;
+    } else {
+      box.innerHTML = `<div class="products-grid">${produkte.map(p => `
+        <article class="product">
+          <div class="img">${p.bild ? `<img src="${esc(p.bild)}" alt="${esc(p.name)}" loading="lazy">` : ""}</div>
+          <div class="row"><h3>${esc(p.name)}</h3><span class="price">${esc(p.preis)}</span></div>
+          <p>${esc(p.beschreibung)}</p>
+        </article>`).join("")}</div>`;
+    }
+
+    // Handy-Menü
+    const burger = document.querySelector(".burger");
+    const menu = document.getElementById("menu");
+    burger.addEventListener("click", () => {
+      const open = menu.classList.toggle("open");
+      burger.setAttribute("aria-expanded", open);
+    });
+    menu.querySelectorAll("a").forEach(a => a.addEventListener("click", () => {
+      menu.classList.remove("open");
+      burger.setAttribute("aria-expanded", false);
+    }));
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
