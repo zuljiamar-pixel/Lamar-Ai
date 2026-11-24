@@ -180,18 +180,32 @@
     .range-list p { color: var(--text3); }
 
     /* Produkte */
-    .products-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px 28px;
-    }
-    .product .img {
-      aspect-ratio: 4 / 5; background: var(--soft); margin-bottom: 18px; overflow: hidden;
-    }
+    .products-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 56px 28px; }
+    .products-grid.single { grid-template-columns: minmax(0, 1fr); }
+    .product { display: grid; gap: 20px; align-content: start; }
+    .products-grid.single .product { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 64px; align-items: center; }
+    .product .img { aspect-ratio: 4 / 5; max-width: 100%; background: var(--soft); overflow: hidden; }
     .product .img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s; }
-    .product:hover .img img { transform: scale(1.03); }
-    .product .row { display: flex; justify-content: space-between; gap: 16px; }
-    .product h3 { font-size: 17px; font-weight: 500; }
-    .product .price { font-variant-numeric: tabular-nums; }
-    .product p { color: var(--grey); font-size: 15px; margin-top: 2px; }
+    .product:hover .img img { transform: scale(1.02); }
+    .info { display: grid; gap: 14px; justify-items: start; min-width: 0; }
+    .tag { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--grey); }
+    .pname { font-family: var(--serif); font-weight: 400; font-size: 28px; line-height: 1.1; text-wrap: balance; }
+    .products-grid.single .pname { font-size: clamp(34px, 4vw, 48px); }
+    .price { font-size: 18px; font-weight: 500; font-variant-numeric: tabular-nums; }
+    .desc { color: var(--text2); max-width: 46ch; }
+    .sizes-label { font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--grey); margin-top: 10px; }
+    .sizes { display: flex; flex-wrap: wrap; gap: 8px; }
+    .size {
+      font: inherit; font-size: 15px; font-variant-numeric: tabular-nums;
+      min-width: 76px; padding: 10px 16px; cursor: pointer;
+      background: transparent; color: var(--fg); border: 1px solid var(--line2); border-radius: 0;
+      transition: border-color .15s, background .15s, color .15s;
+    }
+    .size:hover { border-color: var(--fg); }
+    .size[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+    .order { margin-top: 10px; }
+    .order-msg { font-size: 14px; color: var(--fg); min-height: 1.4em; }
+    .note { font-size: 14px; color: var(--grey); }
 
     .empty {
       border: 1px solid var(--fg); padding: 90px 40px; text-align: center;
@@ -223,7 +237,8 @@
       .facts { grid-column: auto; grid-template-columns: 1fr; margin-top: 24px; }
       .fact { padding: 20px 0; border-bottom: 1px solid var(--line); }
       .range-list li { padding: 28px 0; gap: 8px; }
-      .products-grid { grid-template-columns: repeat(2, 1fr); }
+      .products-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .products-grid.single .product { grid-template-columns: minmax(0, 1fr); gap: 28px; }
       .contact-grid > :first-child { display: none; }
     }
     @media (max-width: 760px) {
@@ -243,7 +258,7 @@
       .hero { padding: 72px 0 72px; }
       section { padding: 80px 0; }
       .empty { padding: 64px 24px; }
-      .products-grid { grid-template-columns: 1fr; }
+      .products-grid { grid-template-columns: minmax(0, 1fr); }
     }
   </style>
 </head>
@@ -370,9 +385,18 @@
        },
        ========================================================= */
     const produkte = [
-      // Noch keine Produkte
+      {
+        name: "Langarmshirt „Have passion“",
+        kategorie: "Kinder",
+        beschreibung: "Raglan-Langarmshirt in Schwarz-Weiß. Vorne und auf beiden Ärmeln steht in Schreibschrift „Have passion and love for life“.",
+        preis: "",                       // z. B. "24,90 €" – leer = „Preis auf Anfrage“
+        groessen: ["5–6 J", "7–8 J", "9–10 J", "11–12 J", "13 J"],
+        hinweis: "Vorbestellung · Lieferung in 6–13 Werktagen",
+        bild: "bilder/langarmshirt-have-passion.jpg"
+      },
     ];
 
+    const EMAIL = "retailshoplgll@gmail.com";
     const box = document.getElementById("products");
     const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
@@ -384,12 +408,50 @@
           <a href="#kontakt" class="btn ghost">Kontakt aufnehmen</a>
         </div>`;
     } else {
-      box.innerHTML = `<div class="products-grid">${produkte.map(p => `
-        <article class="product">
+      box.innerHTML = `<div class="products-grid${produkte.length === 1 ? " single" : ""}">${produkte.map((p, i) => `
+        <article class="product" data-i="${i}">
           <div class="img">${p.bild ? `<img src="${esc(p.bild)}" alt="${esc(p.name)}" loading="lazy">` : ""}</div>
-          <div class="row"><h3>${esc(p.name)}</h3><span class="price">${esc(p.preis)}</span></div>
-          <p>${esc(p.beschreibung)}</p>
+          <div class="info">
+            ${p.kategorie ? `<span class="tag">${esc(p.kategorie)}</span>` : ""}
+            <h3 class="pname">${esc(p.name)}</h3>
+            <span class="price">${p.preis ? esc(p.preis) : "Preis auf Anfrage"}</span>
+            <p class="desc">${esc(p.beschreibung)}</p>
+            ${p.groessen && p.groessen.length ? `
+              <div class="sizes-label" id="sl-${i}">Größe (Alter)</div>
+              <div class="sizes" role="group" aria-labelledby="sl-${i}">
+                ${p.groessen.map(g => `<button type="button" class="size" aria-pressed="false">${esc(g)}</button>`).join("")}
+              </div>` : ""}
+            <a class="btn order" href="mailto:${EMAIL}">Per E-Mail bestellen</a>
+            <p class="order-msg" aria-live="polite"></p>
+            ${p.hinweis ? `<p class="note">${esc(p.hinweis)}</p>` : ""}
+          </div>
         </article>`).join("")}</div>`;
+
+      box.querySelectorAll(".product").forEach(card => {
+        const p = produkte[card.dataset.i];
+        const order = card.querySelector(".order");
+        const msg = card.querySelector(".order-msg");
+        let size = "";
+        const setHref = () => {
+          const subject = `Bestellung: ${p.name}${size ? " – Größe " + size : ""}`;
+          const body = `Hallo Retail Shop LGLL,\n\nich möchte gerne bestellen:\n${p.name}${size ? "\nGröße: " + size : ""}\n\nName:\nAdresse:\n`;
+          order.href = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        };
+        card.querySelectorAll(".size").forEach(btn => btn.addEventListener("click", () => {
+          card.querySelectorAll(".size").forEach(b => b.setAttribute("aria-pressed", "false"));
+          btn.setAttribute("aria-pressed", "true");
+          size = btn.textContent;
+          msg.textContent = `Größe ${size} gewählt. Bestellen an ${EMAIL}`;
+          setHref();
+        }));
+        order.addEventListener("click", e => {
+          if (p.groessen && p.groessen.length && !size) {
+            e.preventDefault();
+            msg.textContent = "Bitte zuerst eine Größe wählen.";
+          }
+        });
+        setHref();
+      });
     }
 
     // Handy-Menü
