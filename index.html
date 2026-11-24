@@ -182,6 +182,9 @@
     /* Produkte */
     .products-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 56px 28px; }
     .products-grid.single { grid-template-columns: minmax(0, 1fr); }
+    .products-grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 64px 48px; }
+    .size.color { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+    .dot { width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--line2); flex: none; }
     .product { display: grid; gap: 20px; align-content: start; }
     .products-grid.single .product { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 64px; align-items: center; }
     .product .img { aspect-ratio: 4 / 5; max-width: 100%; background: var(--soft); overflow: hidden; }
@@ -258,7 +261,7 @@
       .hero { padding: 72px 0 72px; }
       section { padding: 80px 0; }
       .empty { padding: 64px 24px; }
-      .products-grid { grid-template-columns: minmax(0, 1fr); }
+      .products-grid, .products-grid.two { grid-template-columns: minmax(0, 1fr); }
     }
   </style>
 </head>
@@ -388,11 +391,29 @@
       {
         name: "Langarmshirt „Have passion“",
         kategorie: "Kinder",
-        beschreibung: "Raglan-Langarmshirt in Schwarz-Weiß. Vorne und auf beiden Ärmeln steht in Schreibschrift „Have passion and love for life“.",
+        beschreibung: "Raglan-Langarmshirt in Schwarz-Weiss. Vorne und auf beiden Ärmeln steht in Schreibschrift „Have passion and love for life“.",
         preis: "CHF 10.–",               // leer lassen = „Preis auf Anfrage“
+        groessenTitel: "Grösse (Alter)",
         groessen: ["5–6 J", "7–8 J", "9–10 J", "11–12 J", "13 J"],
         hinweis: "Vorbestellung · Lieferung in 6–13 Werktagen",
         bild: "bilder/langarmshirt-have-passion.jpg"
+      },
+      {
+        name: "Langarmshirt „Scream“",
+        kategorie: "Unisex",
+        beschreibung: "Oversize-Langarmshirt mit Freiheitsstatue-Print vorne und grossem „SCREAM“-Schriftzug auf beiden Ärmeln.",
+        preis: "CHF 15.–",
+        farben: [
+          { name: "Schwarz", farbe: "#111111" },
+          { name: "Grau",    farbe: "#55585b" },
+          { name: "Blau",    farbe: "#1f5aa6" },
+          { name: "Beige",   farbe: "#ddd3c2" },
+          { name: "Weiss",    farbe: "#f4f4f4" },
+          { name: "Rot",     farbe: "#a3191d" }
+        ],
+        groessen: ["S", "M", "L", "XL", "XXL"],
+        hinweis: "Bild zeigt die Farbe Schwarz",
+        bild: "bilder/langarmshirt-scream-schwarz.jpg"
       },
     ];
 
@@ -408,7 +429,8 @@
           <a href="#kontakt" class="btn ghost">Kontakt aufnehmen</a>
         </div>`;
     } else {
-      box.innerHTML = `<div class="products-grid${produkte.length === 1 ? " single" : ""}">${produkte.map((p, i) => `
+      const cols = produkte.length === 1 ? " single" : produkte.length % 3 === 0 ? "" : " two";
+      box.innerHTML = `<div class="products-grid${cols}">${produkte.map((p, i) => `
         <article class="product" data-i="${i}">
           <div class="img">${p.bild ? `<img src="${esc(p.bild)}" alt="${esc(p.name)}" loading="lazy">` : ""}</div>
           <div class="info">
@@ -416,10 +438,15 @@
             <h3 class="pname">${esc(p.name)}</h3>
             <span class="price">${p.preis ? esc(p.preis) : "Preis auf Anfrage"}</span>
             <p class="desc">${esc(p.beschreibung)}</p>
+            ${p.farben && p.farben.length ? `
+              <div class="sizes-label" id="fl-${i}">Farbe</div>
+              <div class="sizes" role="group" aria-labelledby="fl-${i}" data-opt="Farbe">
+                ${p.farben.map(f => `<button type="button" class="size color" aria-pressed="false" data-value="${esc(f.name)}"><span class="dot" style="background:${esc(f.farbe)}"></span>${esc(f.name)}</button>`).join("")}
+              </div>` : ""}
             ${p.groessen && p.groessen.length ? `
-              <div class="sizes-label" id="sl-${i}">Größe (Alter)</div>
-              <div class="sizes" role="group" aria-labelledby="sl-${i}">
-                ${p.groessen.map(g => `<button type="button" class="size" aria-pressed="false">${esc(g)}</button>`).join("")}
+              <div class="sizes-label" id="sl-${i}">${esc(p.groessenTitel || "Grösse")}</div>
+              <div class="sizes" role="group" aria-labelledby="sl-${i}" data-opt="Grösse">
+                ${p.groessen.map(g => `<button type="button" class="size" aria-pressed="false" data-value="${esc(g)}">${esc(g)}</button>`).join("")}
               </div>` : ""}
             <a class="btn order" href="mailto:${EMAIL}">Per E-Mail bestellen</a>
             <p class="order-msg" aria-live="polite"></p>
@@ -431,23 +458,28 @@
         const p = produkte[card.dataset.i];
         const order = card.querySelector(".order");
         const msg = card.querySelector(".order-msg");
-        let size = "";
+        const groups = [...card.querySelectorAll(".sizes")];
+        const chosen = {};
+        const summary = () => groups.filter(g => chosen[g.dataset.opt]).map(g => `${g.dataset.opt}: ${chosen[g.dataset.opt]}`);
         const setHref = () => {
-          const subject = `Bestellung: ${p.name}${size ? " – Größe " + size : ""}`;
-          const body = `Hallo Retail Shop LGLL,\n\nich möchte gerne bestellen:\n${p.name}${size ? "\nGröße: " + size : ""}\n\nName:\nAdresse:\n`;
+          const s = summary();
+          const subject = `Bestellung: ${p.name}${s.length ? " – " + s.join(", ") : ""}`;
+          const body = `Hallo Retail Shop LGLL,\n\nich möchte gerne bestellen:\n${p.name}\n${s.join("\n")}\n\nName:\nAdresse:\n`;
           order.href = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         };
-        card.querySelectorAll(".size").forEach(btn => btn.addEventListener("click", () => {
-          card.querySelectorAll(".size").forEach(b => b.setAttribute("aria-pressed", "false"));
+        groups.forEach(g => g.querySelectorAll(".size").forEach(btn => btn.addEventListener("click", () => {
+          g.querySelectorAll(".size").forEach(b => b.setAttribute("aria-pressed", "false"));
           btn.setAttribute("aria-pressed", "true");
-          size = btn.textContent;
-          msg.textContent = `Größe ${size} gewählt. Bestellen an ${EMAIL}`;
+          chosen[g.dataset.opt] = btn.dataset.value;
+          const missing = groups.filter(x => !chosen[x.dataset.opt]).map(x => x.dataset.opt);
+          msg.textContent = missing.length ? `Bitte noch ${missing.join(" und ")} wählen.` : `${summary().join(", ")} gewählt.`;
           setHref();
-        }));
+        })));
         order.addEventListener("click", e => {
-          if (p.groessen && p.groessen.length && !size) {
+          const missing = groups.filter(x => !chosen[x.dataset.opt]).map(x => x.dataset.opt);
+          if (missing.length) {
             e.preventDefault();
-            msg.textContent = "Bitte zuerst eine Größe wählen.";
+            msg.textContent = `Bitte zuerst ${missing.join(" und ")} wählen.`;
           }
         });
         setHref();
