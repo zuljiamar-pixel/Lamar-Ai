@@ -149,7 +149,8 @@
     /* Kontakt */
     .contact { background: var(--black); color: var(--white); }
     .contact .section-num { color: #8a8a8a; }
-    .contact-grid { display: grid; grid-template-columns: 200px 1fr 1fr 1fr; gap: 40px; }
+    .contact-grid { display: grid; grid-template-columns: 200px 1fr; gap: 40px; }
+    .contact-grid .mail { font-family: var(--serif); font-size: clamp(26px, 3.4vw, 40px); line-height: 1.2; overflow-wrap: anywhere; }
     .contact-grid h4 { font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: #8a8a8a; font-weight: 500; margin-bottom: 12px; }
     .contact-grid p, .contact-grid a { color: #e8e8e8; }
     .contact-grid a:hover { text-decoration: underline; text-underline-offset: 4px; }
@@ -283,15 +284,7 @@
           <div></div>
           <div>
             <h4>E-Mail</h4>
-            <a href="mailto:retailshoplgll@gmail.com">retailshoplgll@gmail.com</a>
-          </div>
-          <div>
-            <h4>Telefon</h4>
-            <a href="tel:+490000000000">+49 000 000 000</a>
-          </div>
-          <div>
-            <h4>Adresse</h4>
-            <p>Musterstraße 1<br>12345 Musterstadt</p>
+            <a class="mail" href="mailto:retailshoplgll@gmail.com">retailshoplgll@gmail.com</a>
           </div>
         </div>
       </div>
