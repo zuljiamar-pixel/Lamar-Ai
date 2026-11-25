@@ -211,6 +211,9 @@
     .size.color[aria-pressed="true"] { background: transparent; border-color: var(--fg); }
     .dot { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line2); display: block; }
     .ship { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 13px; font-weight: 500; color: var(--fg); }
+    .ship.pay { margin-top: 0; }
+    .phone { width: 14px; height: 14px; flex: none; position: relative; }
+    .phone::before { content: ""; position: absolute; left: 3px; top: 0; width: 8px; height: 14px; border: 1.5px solid currentColor; border-radius: 2px; box-sizing: border-box; }
     .flag { width: 14px; height: 14px; flex: none; background: #d52b1e; position: relative; }
     .flag::before, .flag::after { content: ""; position: absolute; background: #fff; left: 50%; top: 50%; transform: translate(-50%, -50%); }
     .flag::before { width: 8px; height: 2.4px; }
@@ -533,6 +536,7 @@
                 ${p.groessen.map(g => `<button type="button" class="size" aria-pressed="false" data-value="${esc(g)}">${esc(g)}</button>`).join("")}
               </div>` : ""}
             <p class="ship"><span class="flag" aria-hidden="true"></span>Lieferung nur innerhalb der Schweiz</p>
+            <p class="ship pay"><span class="phone" aria-hidden="true"></span>Bezahlung nur mit TWINT</p>
             <a class="btn order" href="mailto:${EMAIL}">Per E-Mail bestellen</a>
             <p class="order-msg" aria-live="polite"></p>
             ${p.hinweis ? `<p class="note">${esc(p.hinweis)}</p>` : ""}
@@ -549,7 +553,7 @@
         const setHref = () => {
           const s = summary();
           const subject = `Bestellung: ${p.name}${s.length ? " – " + s.join(", ") : ""}`;
-          const body = `Hallo Retail Shop LGLL,\n\nich möchte gerne bestellen (Lieferung in die Schweiz):\n${p.name}\n${s.join("\n")}\n\nName:\nAdresse:\n`;
+          const body = `Hallo Retail Shop LGLL,\n\nich möchte gerne bestellen (Lieferung in die Schweiz, Bezahlung mit TWINT):\n${p.name}\n${s.join("\n")}\n\nName:\nAdresse:\n`;
           order.href = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         };
         groups.forEach(g => g.querySelectorAll(".size").forEach(btn => btn.addEventListener("click", () => {
