@@ -233,6 +233,52 @@
     .filter[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
     .filter .count { color: var(--grey); margin-left: 4px; font-variant-numeric: tabular-nums; }
     .filter[aria-pressed="true"] .count { color: inherit; opacity: .6; }
+    /* Bestellung / Kasse */
+    button.btn { font-family: inherit; cursor: pointer; }
+    #checkout {
+      border: 0; padding: 0; margin: auto; width: min(560px, calc(100vw - 32px)); max-height: calc(100dvh - 32px);
+      background: var(--bg); color: var(--fg); overflow: auto; overscroll-behavior: contain;
+    }
+    #checkout::backdrop { background: rgba(0,0,0,.55); }
+    .co-inner { padding: 28px 28px 32px; display: grid; gap: 22px; }
+    .co-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+    .co-title { font-family: var(--serif); font-weight: 400; font-size: 36px; line-height: 1.05; }
+    .co-close { background: none; border: 0; color: var(--fg); font: inherit; font-size: 30px; line-height: 1; width: 40px; height: 40px; cursor: pointer; }
+    .co-item { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 14px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .co-item img { width: 64px; height: 80px; object-fit: cover; display: block; background: var(--soft); }
+    .co-name { font-weight: 500; font-size: 15px; line-height: 1.3; }
+    .co-opts { color: var(--grey); font-size: 14px; }
+    .co-price { font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    #checkout fieldset { border: 0; display: grid; gap: 12px; min-width: 0; }
+    #checkout legend { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--grey); margin-bottom: 10px; }
+    #checkout label { display: grid; gap: 6px; font-size: 14px; }
+    #checkout .opt { color: var(--grey); }
+    #checkout input {
+      font: inherit; font-size: 16px; width: 100%; padding: 12px 12px; border-radius: 0;
+      background: transparent; color: var(--fg); border: 1px solid var(--line2);
+    }
+    #checkout input:focus { outline: none; border-color: var(--fg); box-shadow: inset 0 0 0 1px var(--fg); }
+    #checkout input[aria-invalid="true"] { border-color: #c4261d; box-shadow: inset 0 0 0 1px #c4261d; }
+    .co-row { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 10px; }
+    .co-land { font-size: 14px; color: var(--grey); display: flex; align-items: center; gap: 8px; }
+    .co-twint { border: 1px solid var(--fg); padding: 18px 18px 18px; display: grid; gap: 10px; }
+    .co-twint-title { font-weight: 600; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+    .co-twint ol { padding-left: 20px; display: grid; gap: 6px; font-size: 14px; color: var(--text2); }
+    .co-sumrow { display: flex; justify-content: space-between; font-size: 15px; font-variant-numeric: tabular-nums; }
+    .co-sumrow.total { font-weight: 600; font-size: 17px; padding-top: 8px; border-top: 1px solid var(--line); }
+    .co-err { color: #c4261d; font-size: 14px; font-weight: 500; }
+    .co-err:empty { display: none; }
+    .co-submit { width: 100%; text-align: center; padding: 16px; font-size: 15px; }
+    .co-small { font-size: 12px; color: var(--grey); text-align: center; }
+    .co-done p { font-size: 15px; color: var(--text2); }
+    .co-done details { border-top: 1px solid var(--line); padding-top: 14px; display: grid; gap: 10px; }
+    .co-done summary { cursor: pointer; font-size: 14px; font-weight: 500; }
+    .co-done textarea { width: 100%; font: inherit; font-size: 13px; padding: 10px; background: var(--soft); color: var(--fg); border: 1px solid var(--line2); border-radius: 0; resize: vertical; margin: 10px 0; }
+    @media (max-width: 760px) {
+      #checkout { width: 100vw; max-width: 100vw; height: 100dvh; max-height: 100dvh; margin: 0; }
+      .co-inner { padding: calc(18px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) calc(28px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); gap: 20px; }
+      .co-title { font-size: 30px; }
+    }
     .menu-sep { padding-left: 36px; border-left: 1px solid var(--line); }
 
     .empty {
@@ -400,6 +446,64 @@
     </section>
   </main>
 
+  <dialog id="checkout" aria-labelledby="co-title">
+    <form class="co-inner" id="co-form" novalidate>
+      <div class="co-head">
+        <h2 class="co-title" id="co-title">Bestellung</h2>
+        <button type="button" class="co-close" data-close aria-label="Schliessen">×</button>
+      </div>
+      <div class="co-item">
+        <img id="co-img" alt="">
+        <div><p class="co-name" id="co-name"></p><p class="co-opts" id="co-opts"></p></div>
+        <p class="co-price" id="co-price"></p>
+      </div>
+      <fieldset>
+        <legend>Lieferadresse</legend>
+        <label for="co-fullname">Vor- und Nachname<input id="co-fullname" name="name" autocomplete="name" required></label>
+        <label for="co-street">Strasse und Hausnummer<input id="co-street" name="street" autocomplete="street-address" required></label>
+        <div class="co-row">
+          <label for="co-plz">PLZ<input id="co-plz" name="plz" inputmode="numeric" autocomplete="postal-code" maxlength="4" required></label>
+          <label for="co-ort">Ort<input id="co-ort" name="ort" autocomplete="address-level2" required></label>
+        </div>
+        <p class="co-land"><span class="flag" aria-hidden="true"></span>Schweiz (wir liefern nur innerhalb der Schweiz)</p>
+      </fieldset>
+      <fieldset>
+        <legend>Kontakt</legend>
+        <label for="co-tel">Handynummer für TWINT<input id="co-tel" name="tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="079 123 45 67" required></label>
+        <label for="co-mail"><span>E-Mail <span class="opt">(freiwillig)</span></span><input id="co-mail" name="email" type="email" autocomplete="email"></label>
+      </fieldset>
+      <div class="co-twint">
+        <p class="co-twint-title"><span class="phone" aria-hidden="true"></span>Bezahlung mit TWINT</p>
+        <ol>
+          <li>Du schickst die Bestellung ab.</li>
+          <li>Wir schicken dir eine TWINT-Zahlungsanfrage auf deine Handynummer.</li>
+          <li>Du bestätigst sie in deiner TWINT-App. Danach versenden wir deine Bestellung.</li>
+        </ol>
+        <div class="co-sumrow"><span>Artikel</span><span id="co-sub"></span></div>
+        <div class="co-sumrow"><span>Versand</span><span id="co-ship"></span></div>
+        <div class="co-sumrow total"><span>Total mit TWINT</span><span id="co-total"></span></div>
+      </div>
+      <p class="co-err" id="co-err" aria-live="polite"></p>
+      <button type="submit" class="btn co-submit">Bestellung abschicken</button>
+      <p class="co-small">Lieferung nur innerhalb der Schweiz · Bezahlung nur mit TWINT</p>
+    </form>
+    <div class="co-inner co-done" id="co-done" hidden>
+      <div class="co-head">
+        <h2 class="co-title">Fast geschafft.</h2>
+        <button type="button" class="co-close" data-close aria-label="Schliessen">×</button>
+      </div>
+      <p>Deine E-Mail-App hat sich mit der fertigen Bestellung geöffnet. Tippe dort auf <b>Senden</b>.</p>
+      <p>Danach bekommst du von uns die TWINT-Zahlungsanfrage über <b id="co-done-sum"></b> auf <b id="co-done-tel"></b>.</p>
+      <details>
+        <summary>Die E-Mail-App hat sich nicht geöffnet?</summary>
+        <p>Kopiere die Bestellung und schicke sie an <b>retailshoplgll@gmail.com</b>.</p>
+        <textarea id="co-text" rows="9" readonly></textarea>
+        <button type="button" class="btn ghost" id="co-copy">Bestellung kopieren</button>
+      </details>
+      <button type="button" class="btn co-submit" data-close>Fertig</button>
+    </div>
+  </dialog>
+
   <footer>
     <div class="wrap">
       <a href="#start" class="footer-logo" aria-label="Retail Shop LGLL, zum Start"><svg xmlns="http://www.w3.org/2000/svg" viewBox="358 80 484 263" role="img" aria-label="Retail Shop LGLL"><title>Retail Shop LGLL</title><path fill="currentColor" d="M363.42 250.0Q359.97 250.0 359.97 247.47Q359.97 245.4 362.96000000000004 244.71L368.25 243.79Q373.08000000000004 242.87 374.57500000000005 241.26Q376.07000000000005 239.65 376.07000000000005 234.82V99.57999999999998Q376.07000000000005 94.75 374.57500000000005 93.14Q373.08000000000004 91.53 368.25 90.60999999999999L362.96000000000004 89.69Q359.97 89.0 359.97 86.93Q359.97 84.4 363.42 84.4H405.51000000000005Q408.96000000000004 84.4 408.96000000000004 87.16Q408.96000000000004 89.22999999999999 406.43 89.69L400.22 90.60999999999999Q395.39000000000004 91.29999999999998 393.89500000000004 93.13999999999999Q392.40000000000003 94.97999999999999 392.40000000000003 99.81V228.61Q392.40000000000003 236.89 397.115 240.57Q401.83000000000004 244.25 408.96000000000004 244.25Q414.25 244.25 419.885 242.065Q425.52000000000004 239.88 430.12 233.785Q434.72 227.69 437.02000000000004 215.96L440.01 200.55Q440.70000000000005 197.56 443.46000000000004 197.56Q446.68 197.56 446.22 201.47L443.46000000000004 244.71Q443.0 250.0 437.71000000000004 250.0ZM545.52 252.07Q526.89 252.07 514.01 241.49Q501.13000000000005 230.91 494.46000000000004 211.70499999999998Q487.79 192.5 487.79 166.28Q487.79 140.98 495.61 122.005Q503.43 103.03 517.115 92.565Q530.8000000000001 82.1 548.51 82.1Q557.48 82.1 564.84 83.82499999999999Q572.2 85.54999999999998 577.72 88.31Q580.71 89.91999999999999 580.71 93.13999999999999L581.4000000000001 128.1Q581.4000000000001 132.01 578.6400000000001 132.01Q576.11 132.01 575.4200000000001 129.01999999999998L573.58 122.11999999999999Q568.52 103.03 562.0799999999999 95.89999999999999Q555.64 88.76999999999998 544.37 88.76999999999998Q527.58 88.76999999999998 516.655 108.66499999999999Q505.73 128.56 505.73 166.28Q505.73 205.15 516.885 225.505Q528.0400000000001 245.86 545.52 245.86Q554.95 245.86 559.78 241.72000000000003Q564.61 237.58 564.61 226.31V175.94Q564.61 171.11 563.115 169.27Q561.62 167.43 556.7900000000001 166.97L547.82 166.05Q544.83 165.82 544.83 163.29Q544.83 160.76 548.28 160.76H590.37Q593.82 160.76 593.82 163.51999999999998Q593.82 165.59 591.2900000000001 166.05L587.84 166.51Q582.78 167.2 581.86 169.26999999999998Q580.94 171.34 580.94 176.17000000000002V238.5Q580.94 241.03 579.5600000000001 242.525Q578.1800000000001 244.02 574.73 245.86Q569.21 248.62 562.08 250.345Q554.95 252.07 545.52 252.07ZM634.2400000000001 250.0Q630.7900000000001 250.0 630.7900000000001 247.47Q630.7900000000001 245.4 633.7800000000001 244.71L639.07 243.79Q643.9000000000001 242.87 645.3950000000001 241.26Q646.8900000000001 239.65 646.8900000000001 234.82V99.57999999999998Q646.8900000000001 94.75 645.3950000000001 93.14Q643.9000000000001 91.53 639.07 90.60999999999999L633.7800000000001 89.69Q630.7900000000001 89.0 630.7900000000001 86.93Q630.7900000000001 84.4 634.2400000000001 84.4H676.33Q679.7800000000001 84.4 679.7800000000001 87.16Q679.7800000000001 89.22999999999999 677.2500000000001 89.69L671.0400000000001 90.60999999999999Q666.21 91.29999999999998 664.715 93.13999999999999Q663.22 94.97999999999999 663.22 99.81V228.61Q663.22 236.89 667.9350000000001 240.57Q672.6500000000001 244.25 679.7800000000001 244.25Q685.07 244.25 690.705 242.065Q696.34 239.88 700.94 233.785Q705.5400000000001 227.69 707.84 215.96L710.83 200.55Q711.5200000000001 197.56 714.2800000000001 197.56Q717.5000000000001 197.56 717.0400000000001 201.47L714.2800000000001 244.71Q713.82 250.0 708.5300000000001 250.0ZM757.2300000000001 250.0Q753.7800000000001 250.0 753.7800000000001 247.47Q753.7800000000001 245.4 756.7700000000001 244.71L762.0600000000001 243.79Q766.8900000000001 242.87 768.3850000000001 241.26Q769.8800000000001 239.65 769.8800000000001 234.82V99.57999999999998Q769.8800000000001 94.75 768.3850000000001 93.14Q766.8900000000001 91.53 762.0600000000001 90.60999999999999L756.7700000000001 89.69Q753.7800000000001 89.0 753.7800000000001 86.93Q753.7800000000001 84.4 757.2300000000001 84.4H799.32Q802.7700000000001 84.4 802.7700000000001 87.16Q802.7700000000001 89.22999999999999 800.2400000000001 89.69L794.0300000000001 90.60999999999999Q789.2 91.29999999999998 787.705 93.13999999999999Q786.21 94.97999999999999 786.21 99.81V228.61Q786.21 236.89 790.9250000000001 240.57Q795.6400000000001 244.25 802.7700000000001 244.25Q808.0600000000001 244.25 813.695 242.065Q819.33 239.88 823.9300000000001 233.785Q828.5300000000001 227.69 830.83 215.96L833.82 200.55Q834.5100000000001 197.56 837.2700000000001 197.56Q840.4900000000001 197.56 840.0300000000001 201.47L837.2700000000001 244.71Q836.8100000000001 250.0 831.5200000000001 250.0Z M394.09700000000004 340.0V313.514H402.267Q405.38300000000004 313.514 407.34000000000003 314.42600000000004Q409.297 315.338 410.228 317.029Q411.159 318.72 411.159 321.038Q411.159 324.458 409.202 326.396Q407.245 328.334 403.559 328.638Q402.913 328.676 402.077 328.676Q401.241 328.676 400.519 328.676H397.973V340.0ZM408.765 340.0 401.963 328.22 405.915 327.726 413.211 340.0ZM397.973 325.256H401.887Q403.483 325.256 404.68 324.85699999999997Q405.877 324.458 406.59900000000005 323.54600000000005Q407.321 322.634 407.321 321.076Q407.321 319.51800000000003 406.59900000000005 318.625Q405.877 317.73199999999997 404.661 317.352Q403.445 316.972 401.887 316.972H397.973ZM436.011 340.0V313.514H453.529V316.972H439.887V324.724H452.389V328.182H439.887V336.542H453.529V340.0ZM483.511 340.0V316.972H474.847V313.514H496.051V316.972H487.425V340.0ZM516.115 340.0 526.413 313.514H529.415L539.675 340.0H535.457L527.933 319.138L520.371 340.0ZM522.1949999999999 334.11 523.3729999999999 330.652H532.4169999999999L533.709 334.11ZM562.095 340.0V313.514H565.971V340.0ZM590.671 340.0V313.514H594.547V336.542H606.2130000000001V340.0ZM665.797 340.456Q661.731 340.456 659.1279999999999 338.328Q656.525 336.2 655.955 332.666L659.717 331.754Q660.135 334.338 661.807 335.668Q663.479 336.998 665.911 336.998Q667.317 336.998 668.4 336.485Q669.483 335.972 670.1289999999999 335.003Q670.775 334.034 670.775 332.818Q670.775 331.526 670.072 330.69Q669.369 329.854 668.096 329.18899999999996Q666.823 328.524 665.037 327.84Q662.719 326.966 661.066 325.94Q659.413 324.914 658.52 323.48900000000003Q657.627 322.064 657.627 320.05Q657.627 317.998 658.634 316.421Q659.641 314.844 661.4649999999999 313.932Q663.289 313.02 665.683 313.02Q668.229 313.02 670.224 314.179Q672.219 315.338 673.397 317.656L670.319 319.556Q669.483 318.036 668.2860000000001 317.238Q667.089 316.44 665.569 316.44Q664.391 316.44 663.46 316.89599999999996Q662.529 317.352 662.0160000000001 318.131Q661.503 318.91 661.503 319.974Q661.503 321.076 662.13 321.874Q662.757 322.672 663.992 323.299Q665.227 323.926 667.089 324.61Q669.445 325.522 671.117 326.567Q672.789 327.612 673.701 329.05600000000004Q674.613 330.5 674.613 332.59Q674.613 334.87 673.492 336.637Q672.371 338.404 670.395 339.43Q668.419 340.456 665.797 340.456ZM698.0590000000001 340.0V313.514H701.9350000000001V324.61H714.437V313.514H718.3130000000001V340.0H714.437V328.22H701.9350000000001V340.0ZM754.299 340.494Q750.613 340.494 747.82 338.784Q745.027 337.074 743.469 333.977Q741.9110000000001 330.88 741.9110000000001 326.776Q741.9110000000001 322.634 743.469 319.53700000000003Q745.027 316.44 747.82 314.73Q750.613 313.02 754.299 313.02Q758.061 313.02 760.873 314.73Q763.6850000000001 316.44 765.243 319.53700000000003Q766.801 322.634 766.801 326.776Q766.801 330.88 765.224 333.977Q763.647 337.074 760.835 338.784Q758.023 340.494 754.299 340.494ZM754.299 336.808Q756.9590000000001 336.808 758.859 335.573Q760.759 334.338 761.8230000000001 332.077Q762.8870000000001 329.816 762.8870000000001 326.776Q762.8870000000001 323.698 761.8230000000001 321.437Q760.759 319.176 758.859 317.94100000000003Q756.9590000000001 316.706 754.299 316.706Q751.715 316.706 749.796 317.922Q747.8770000000001 319.138 746.8320000000001 321.399Q745.787 323.66 745.787 326.776Q745.787 329.854 746.8320000000001 332.115Q747.8770000000001 334.376 749.796 335.592Q751.715 336.808 754.299 336.808ZM790.437 340.0V313.514H798.607Q802.977 313.514 805.238 315.414Q807.499 317.314 807.499 321.076Q807.499 324.8 805.219 326.776Q802.939 328.752 798.607 328.752H794.275V340.0ZM794.275 325.332H798.227Q800.773 325.332 802.217 324.325Q803.661 323.318 803.661 321.114Q803.661 318.948 802.2739999999999 317.96Q800.887 316.972 798.227 316.972H794.275Z"/><rect x="360.0" y="282" width="480.1" height="2" fill="currentColor"/></svg></a>
@@ -537,7 +641,7 @@
               </div>` : ""}
             <p class="ship"><span class="flag" aria-hidden="true"></span>Lieferung nur innerhalb der Schweiz</p>
             <p class="ship pay"><span class="phone" aria-hidden="true"></span>Bezahlung nur mit TWINT</p>
-            <a class="btn order" href="mailto:${EMAIL}">Per E-Mail bestellen</a>
+            <button type="button" class="btn order">Bestellen</button>
             <p class="order-msg" aria-live="polite"></p>
             ${p.hinweis ? `<p class="note">${esc(p.hinweis)}</p>` : ""}
           </div>
@@ -549,13 +653,6 @@
         const msg = card.querySelector(".order-msg");
         const groups = [...card.querySelectorAll(".sizes")];
         const chosen = {};
-        const summary = () => groups.filter(g => chosen[g.dataset.opt]).map(g => `${g.dataset.opt}: ${chosen[g.dataset.opt]}`);
-        const setHref = () => {
-          const s = summary();
-          const subject = `Bestellung: ${p.name}${s.length ? " – " + s.join(", ") : ""}`;
-          const body = `Hallo Retail Shop LGLL,\n\nich möchte gerne bestellen (Lieferung in die Schweiz, Bezahlung mit TWINT):\n${p.name}\n${s.join("\n")}\n\nName:\nAdresse:\n`;
-          order.href = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-        };
         groups.forEach(g => g.querySelectorAll(".size").forEach(btn => btn.addEventListener("click", () => {
           g.querySelectorAll(".size").forEach(b => b.setAttribute("aria-pressed", "false"));
           btn.setAttribute("aria-pressed", "true");
@@ -566,18 +663,109 @@
           lab.textContent = `${lab.dataset.base}: ${btn.dataset.value}`;
           const missing = groups.filter(x => !chosen[x.dataset.opt]).map(x => x.dataset.opt);
           msg.textContent = missing.length ? `Bitte noch ${missing.join(" und ")} wählen.` : "";
-          setHref();
         })));
-        order.addEventListener("click", e => {
+        order.addEventListener("click", () => {
           const missing = groups.filter(x => !chosen[x.dataset.opt]).map(x => x.dataset.opt);
-          if (missing.length) {
-            e.preventDefault();
-            msg.textContent = `Bitte zuerst ${missing.join(" und ")} wählen.`;
-          }
+          if (missing.length) { msg.textContent = `Bitte zuerst ${missing.join(" und ")} wählen.`; return; }
+          msg.textContent = "";
+          const img = card.querySelector(".img img");
+          oeffneKasse(p, groups.map(g => [g.dataset.opt, chosen[g.dataset.opt]]), img && img.getAttribute("src"));
         });
-        setHref();
       });
     }
+
+    // ---------- Kasse: Bestellung mit TWINT-Zahlungsanfrage ----------
+    // Versandkosten in Franken, z. B. 7 oder 0 (= gratis). null = noch offen.
+    const VERSAND_CHF = null;
+    const dlg = document.getElementById("checkout");
+    const coForm = document.getElementById("co-form");
+    const coDone = document.getElementById("co-done");
+    const coErr = document.getElementById("co-err");
+    const chf = n => Number.isInteger(n) ? `CHF ${n}.–` : `CHF ${n.toFixed(2)}`;
+    const preisZahl = s => { const m = String(s || "").match(/(\d+(?:[.,]\d{1,2})?)/); return m ? parseFloat(m[1].replace(",", ".")) : 0; };
+    let aktuell = null;
+
+    function oeffneKasse(p, auswahl, bild) {
+      aktuell = { p, auswahl };
+      document.getElementById("co-img").src = bild || p.bild || "";
+      document.getElementById("co-name").textContent = p.name;
+      document.getElementById("co-opts").textContent = auswahl.map(([k, v]) => `${k}: ${v}`).join(" · ");
+      document.getElementById("co-price").textContent = p.preis;
+      const sub = preisZahl(p.preis);
+      document.getElementById("co-sub").textContent = chf(sub);
+      document.getElementById("co-ship").textContent = VERSAND_CHF === null ? "wird bestätigt" : VERSAND_CHF === 0 ? "gratis" : chf(VERSAND_CHF);
+      document.getElementById("co-total").textContent = VERSAND_CHF === null ? `${chf(sub)} + Versand` : chf(sub + VERSAND_CHF);
+      coErr.textContent = "";
+      coForm.querySelectorAll("input").forEach(i => i.removeAttribute("aria-invalid"));
+      try {
+        const gespeichert = JSON.parse(localStorage.getItem("lgll-adresse") || "{}");
+        ["fullname", "street", "plz", "ort", "tel", "mail"].forEach(k => { const el = document.getElementById("co-" + k); if (gespeichert[k] && !el.value) el.value = gespeichert[k]; });
+      } catch (_) {}
+      coForm.hidden = false; coDone.hidden = true;
+      if (typeof dlg.showModal === "function") dlg.showModal(); else dlg.setAttribute("open", "");
+      document.documentElement.style.overflow = "hidden";
+      dlg.scrollTop = 0;
+    }
+    function schliesseKasse() {
+      if (dlg.open) { if (typeof dlg.close === "function") dlg.close(); else dlg.removeAttribute("open"); }
+      document.documentElement.style.overflow = "";
+    }
+    dlg.addEventListener("close", () => { document.documentElement.style.overflow = ""; });
+    dlg.addEventListener("click", e => { if (e.target === dlg || e.target.closest("[data-close]")) schliesseKasse(); });
+
+    function pruefe() {
+      const v = id => document.getElementById("co-" + id).value.trim();
+      const tel = v("tel").replace(/[\s().\/-]/g, "");
+      const regeln = [
+        ["fullname", v("fullname").length >= 3 && /\s/.test(v("fullname")), "Bitte Vor- und Nachnamen eingeben."],
+        ["street", v("street").length >= 3, "Bitte Strasse und Hausnummer eingeben."],
+        ["plz", /^[1-9]\d{3}$/.test(v("plz")), "Bitte eine Schweizer PLZ mit 4 Ziffern eingeben."],
+        ["ort", v("ort").length >= 2, "Bitte den Ort eingeben."],
+        ["tel", /^(\+41|0041|0)7[5-9]\d{7}$/.test(tel), "Bitte eine Schweizer Handynummer eingeben, z. B. 079 123 45 67."],
+        ["mail", !v("mail") || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v("mail")), "Die E-Mail-Adresse stimmt nicht."],
+      ];
+      let erster = null;
+      regeln.forEach(([id, ok, text]) => {
+        const el = document.getElementById("co-" + id);
+        if (ok) el.removeAttribute("aria-invalid"); else { el.setAttribute("aria-invalid", "true"); if (!erster) erster = [el, text]; }
+      });
+      if (erster) { coErr.textContent = erster[1]; erster[0].focus(); return null; }
+      coErr.textContent = "";
+      return { fullname: v("fullname"), street: v("street"), plz: v("plz"), ort: v("ort"), tel: v("tel"), mail: v("mail") };
+    }
+
+    coForm.addEventListener("input", e => { if (e.target.getAttribute("aria-invalid")) e.target.removeAttribute("aria-invalid"); });
+    coForm.addEventListener("submit", e => {
+      e.preventDefault();
+      const d = pruefe(); if (!d || !aktuell) return;
+      try { localStorage.setItem("lgll-adresse", JSON.stringify(d)); } catch (_) {}
+      const { p, auswahl } = aktuell;
+      const sub = preisZahl(p.preis);
+      const total = VERSAND_CHF === null ? `${chf(sub)} + Versand` : chf(sub + VERSAND_CHF);
+      const text = [
+        "Neue Bestellung – Retail Shop LGLL", "",
+        `Produkt: ${p.name}`,
+        ...auswahl.map(([k, v]) => `${k}: ${v}`),
+        `Preis: ${p.preis}`,
+        `Total mit TWINT: ${total}`, "",
+        "Lieferadresse:", d.fullname, d.street, `${d.plz} ${d.ort}`, "Schweiz", "",
+        `Handynummer für TWINT: ${d.tel}`,
+        d.mail ? `E-Mail: ${d.mail}` : "E-Mail: –", "",
+        "Bezahlung: Bitte TWINT-Zahlungsanfrage an die Handynummer oben schicken.",
+      ].join("\n");
+      const subject = `Bestellung: ${p.name}${auswahl.length ? " – " + auswahl.map(a => a[1]).join(", ") : ""} – ${d.fullname}`;
+      document.getElementById("co-text").value = text;
+      document.getElementById("co-done-sum").textContent = total;
+      document.getElementById("co-done-tel").textContent = d.tel;
+      coForm.hidden = true; coDone.hidden = false; dlg.scrollTop = 0;
+      window.location.href = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;
+    });
+    document.getElementById("co-copy").addEventListener("click", e => {
+      const ta = document.getElementById("co-text"), btn = e.currentTarget;
+      const fertig = () => { btn.textContent = "Kopiert"; setTimeout(() => btn.textContent = "Bestellung kopieren", 2000); };
+      const auswahlText = () => { ta.focus(); ta.select(); try { document.execCommand("copy"); fertig(); } catch (_) {} };
+      try { navigator.clipboard.writeText(ta.value).then(fertig, auswahlText); } catch (_) { auswahlText(); }
+    });
 
     // Kategorien (Schuhe / Shirts / Hosen)
     const KATS = [["alle", "Alle"], ["schuhe", "Schuhe"], ["shirts", "Shirts"], ["hosen", "Hosen"]];
