@@ -65,6 +65,7 @@
   #s5 .head { top: 780px; font-size: 150px; line-height: 1.02; }
   #s5 .head .mask { padding-bottom: 10px; }
   #s5 .sub { top: 1250px; font-size: 30px; color: var(--grey); }
+  #s5 .pay { top: 1320px; font-size: 30px; color: var(--white); }
 
   /* 6 – Schluss */
   #s6 .word { top: 520px; font-size: 220px; line-height: 1; display: flex; justify-content: center; gap: 24px; }
@@ -74,7 +75,8 @@
   #s6 .cta { top: 1040px; font-size: 104px; line-height: 1.05; }
   #s6 .url { position: absolute; top: 1240px; left: 50%; transform: translateX(-50%); white-space: nowrap;
              padding: 30px 44px; border: 2px solid var(--white); font-size: 40px; font-weight: 500; letter-spacing: .01em; }
-  #s6 .meta { top: 1410px; font-size: 26px; color: var(--grey); }
+  #s6 .meta { top: 1410px; font-size: 26px; line-height: 2.2; color: var(--grey); }
+  #s6 .meta .paymeta { color: var(--white); }
   #s6 .meta b { display: inline-block; width: 26px; height: 26px; background: var(--red); vertical-align: -4px; margin-right: 14px; position: relative; }
   #s6 .meta b::before, #s6 .meta b::after { content: ""; position: absolute; left: 50%; top: 50%; background: var(--white); transform: translate(-50%, -50%); }
   #s6 .meta b::before { width: 16px; height: 5px; }
@@ -124,6 +126,7 @@
     <span class="mask"><span>die ganze Schweiz.</span></span>
   </div>
   <div class="center sub label"><span class="mask"><span>Lieferung nur innerhalb der Schweiz</span></span></div>
+  <div class="center pay label"><span class="mask"><span>Bezahlung nur mit TWINT</span></span></div>
 </section>
 
 <!-- 6 Schluss -->
@@ -133,7 +136,7 @@
   <div class="center sub label" id="s6sub">Retail Shop</div>
   <div class="center cta serif"><span class="mask"><span>Jetzt bestellen.</span></span></div>
   <div class="url" id="url">zuljiamar-pixel.github.io/Lamar-Ai</div>
-  <div class="center meta label" id="meta"><b></b>Nur Lieferung in der Schweiz</div>
+  <div class="center meta label" id="meta"><b></b>Nur Lieferung in der Schweiz<br><span class="paymeta">Bezahlung nur mit TWINT</span></div>
 </section>
 
 <div id="fade"></div>
@@ -258,6 +261,7 @@
     $("#flag .v").style.transform = `scaleY(${eOut(seg(t, T.s5 + .35, T.s5 + 1.1)).toFixed(4)})`;
     $$("#s5 .head .mask > span").forEach((s, i) => rise(s, t, T.s5 + .2 + i * .14, .9));
     rise($("#s5 .sub .mask > span"), t, T.s5 + .75, .8);
+    rise($("#s5 .pay .mask > span"), t, T.s5 + .95, .8);
 
     // 6 – Schluss
     $$("#s6word .mask > span").forEach((s, i) => rise(s, t, T.s6 - .1 + i * .07, .9));
