@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Retail Shop LGLL – Werbevideo 2 (Streetwear)</title>
+<style>
+  /* Werbevideo 2: Streetwear-Stil, 1080×1920, ~20 s. Fette Schrift, harte Schnitte, Lauf-Bänder, Schweizer Rot.
+     Alles hängt nur von der Zeit t ab (render(t)), damit Bild für Bild gerendert werden kann. */
+  @font-face { font-family: "AN"; src: url(fonts/Anton-Regular.ttf); }
+  @font-face { font-family: "SM"; font-weight: 400; src: url(fonts/SpaceMono-Regular.ttf); }
+  @font-face { font-family: "SM"; font-weight: 700; src: url(fonts/SpaceMono-Bold.ttf); }
+  @font-face { font-family: "HG"; font-weight: 600; src: url(fonts/HankenGrotesk-600.ttf); }
+  :root { --k: #0a0a0a; --w: #ffffff; --r: #d52b1e; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--k); }
+  .scene { position: absolute; inset: 0; overflow: hidden; display: none; }
+  .an { font-family: "AN", Impact, sans-serif; text-transform: uppercase; line-height: .88; letter-spacing: .005em; white-space: nowrap; }
+  .sm { font-family: "SM", monospace; text-transform: uppercase; letter-spacing: .08em; }
+  .fit { display: block; width: max-content; }
+
+  /* Lauf-Band */
+  .band { position: absolute; left: -300px; width: 1680px; height: 150px; display: flex; align-items: center; overflow: hidden; }
+  .band .track { display: flex; white-space: nowrap; will-change: transform; }
+  .band .seg { font-family: "AN"; font-size: 104px; text-transform: uppercase; padding-right: 50px; line-height: 1; }
+
+  /* 1 – Ansage */
+  #s1 { background: var(--k); color: var(--w); }
+  #s1 .stack { position: absolute; left: 60px; top: 300px; display: grid; gap: 18px; }
+  #s1 .stack .fit { transform-origin: left center; }
+  #s1 .stack .red { color: var(--r); }
+
+  /* 2 – Marke mit Bändern */
+  #s2 { background: var(--r); }
+  #s2 .b1 { top: 360px; transform: rotate(-12deg); background: var(--w); color: var(--k); }
+  #s2 .b2 { top: 1420px; transform: rotate(9deg); background: var(--k); color: var(--w); }
+  #s2 .logo { position: absolute; left: 0; right: 0; top: 640px; text-align: center; color: var(--w); }
+  #s2 .logo .fit { margin: 0 auto; }
+  #s2 .logo .sub { font-size: 40px; margin-top: 26px; font-weight: 700; letter-spacing: .4em; }
+
+  /* 3 – Produkte */
+  .prod { background: var(--k); }
+  .prod img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: 50% 45%; }
+  .prod img.bg { filter: blur(38px) brightness(.7); transform: scale(1.25); }
+  .prod img.ganz { inset: auto; top: 250px; left: 0; width: 1080px; height: 1350px; }
+  .prod .shade { position: absolute; inset: auto 0 0 0; height: 900px; background: linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,0)); }
+  .prod .count { position: absolute; top: 150px; left: 60px; background: var(--k); color: var(--w); font-size: 30px; font-weight: 700; padding: 10px 18px; }
+  .prod .tag { position: absolute; top: 150px; right: 60px; background: var(--w); color: var(--k); font-size: 30px; font-weight: 700; padding: 10px 18px; }
+  .prod .name { position: absolute; left: 60px; bottom: 690px; background: var(--w); color: var(--k); font-family: "HG"; font-weight: 600; font-size: 40px; text-transform: uppercase; letter-spacing: .04em; padding: 14px 22px; }
+  .prod .price { position: absolute; left: 60px; bottom: 400px; background: var(--k); color: var(--w); font-size: 230px; padding: 26px 34px 14px; }
+  .prod .price em { font-style: normal; color: var(--r); }
+
+  /* 4 – Raster */
+  #s4 { background: var(--k); }
+  #s4 .grid { position: absolute; left: 60px; top: 70px; width: 960px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  #s4 .tile { aspect-ratio: 4 / 5; overflow: hidden; background: #1a1a1a; }
+  #s4 .tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  #s4 .sticker { position: absolute; left: 50%; top: 50%; width: 520px; height: 520px; margin: -260px 0 0 -260px; border-radius: 50%;
+                 background: var(--r); color: var(--w); display: grid; place-content: center; text-align: center; box-shadow: 0 30px 80px rgba(0,0,0,.45); }
+  #s4 .sticker .ab { font-size: 70px; line-height: 1; }
+  #s4 .sticker .chf { font-size: 190px; line-height: .9; }
+  #s4 .sticker .sm { font-size: 30px; font-weight: 700; margin-top: 12px; }
+
+  /* 5 – Kategorien */
+  .word { display: grid; place-items: center; }
+  .word .fit { position: absolute; left: 60px; top: calc(50% - .44em); }
+  .word.w { background: var(--w); color: var(--k); }
+  .word.k { background: var(--k); color: var(--w); }
+  .word.r { background: var(--r); color: var(--w); }
+  .word .small { position: absolute; bottom: 470px; left: 0; right: 0; text-align: center; font-size: 34px; font-weight: 700; }
+
+  /* 6 – Schweiz / TWINT */
+  #s6 { background: var(--r); color: var(--w); }
+  #s6 .cross { position: absolute; left: 540px; top: 960px; width: 0; height: 0; }
+  #s6 .cross i { position: absolute; background: var(--w); left: 0; top: 0; }
+  #s6 .lines { position: absolute; left: 60px; top: 900px; display: grid; gap: 14px; }
+  #s7 { background: var(--k); color: var(--w); }
+  #s7 .phone { position: absolute; left: 50%; top: 360px; width: 230px; height: 400px; margin-left: -115px; border: 16px solid var(--w); border-radius: 40px; }
+  #s7 .phone::after { content: ""; position: absolute; left: 50%; bottom: 22px; width: 60px; height: 10px; margin-left: -30px; border-radius: 5px; background: var(--w); }
+  #s7 .phone b { position: absolute; left: 50%; top: 50%; font-family: "AN"; font-size: 120px; color: var(--w); transform: translate(-50%, -54%); }
+  #s7 .lines { position: absolute; left: 60px; top: 880px; display: grid; gap: 14px; }
+  #s7 .lines .red { color: var(--r); }
+
+  /* 8 – Schluss */
+  #s8 { background: var(--w); color: var(--k); }
+  #s8 .stack { position: absolute; left: 60px; top: 250px; display: grid; gap: 16px; }
+  #s8 .url { position: absolute; left: 60px; top: 1170px; background: var(--k); color: var(--w); padding: 30px 36px 22px; }
+  #s8 .meta { position: absolute; left: 60px; top: 1370px; font-size: 32px; font-weight: 700; display: flex; align-items: center; gap: 16px; }
+  #s8 .meta i { display: inline-block; width: 34px; height: 34px; background: var(--r); position: relative; }
+  #s8 .meta i::before, #s8 .meta i::after { content: ""; position: absolute; left: 50%; top: 50%; background: var(--w); transform: translate(-50%, -50%); }
+  #s8 .meta i::before { width: 22px; height: 7px; }
+  #s8 .meta i::after { width: 7px; height: 22px; }
+  #s8 .b3 { top: 1640px; left: -40px; width: 1160px; background: var(--k); color: var(--w); transform: rotate(-3deg); }
+
+  #grain { position: absolute; inset: -200px; pointer-events: none; opacity: .07; mix-blend-mode: overlay; z-index: 50; }
+  #flash { position: absolute; inset: 0; background: var(--w); opacity: 0; pointer-events: none; z-index: 60; }
+  #fade { position: absolute; inset: 0; background: var(--k); opacity: 0; pointer-events: none; z-index: 70; }
+</style>
+</head>
+<body>
+
+<section class="scene" id="s1">
+  <div class="stack an">
+    <span class="fit" data-w="960" data-max="330">Gute</span>
+    <span class="fit" data-w="960" data-max="330">Kleider.</span>
+    <span class="fit red" data-w="960" data-max="330">Kleine</span>
+    <span class="fit red" data-w="960" data-max="330">Preise.</span>
+  </div>
+</section>
+
+<section class="scene" id="s2">
+  <div class="band b1"><div class="track"></div></div>
+  <div class="band b2"><div class="track"></div></div>
+  <div class="logo">
+    <span class="fit an" data-w="760">LGLL</span>
+    <div class="sub sm">Retail Shop</div>
+  </div>
+</section>
+
+<div id="prods"></div>
+
+<section class="scene" id="s4">
+  <div class="grid" id="grid"></div>
+  <div class="sticker" id="sticker">
+    <div class="ab an">Alles ab</div>
+    <div class="chf an">CHF 10</div>
+    <div class="sm">6 Styles</div>
+  </div>
+</section>
+
+<section class="scene word w" id="w1"><span class="fit an" data-w="960">Schuhe.</span><div class="small sm">Sneaker ab CHF 30</div></section>
+<section class="scene word k" id="w2"><span class="fit an" data-w="960">Shirts.</span><div class="small sm">ab CHF 10</div></section>
+<section class="scene word r" id="w3"><span class="fit an" data-w="960">Hosen.</span><div class="small sm">ab CHF 10</div></section>
+
+<section class="scene" id="s6">
+  <div class="cross" id="cross"><i class="h"></i><i class="v"></i></div>
+  <div class="lines an" id="s6lines">
+    <span class="fit" data-w="960">Lieferung</span>
+    <span class="fit" data-w="960">nur in die</span>
+    <span class="fit" data-w="960">Schweiz.</span>
+  </div>
+</section>
+
+<section class="scene" id="s7">
+  <div class="phone" id="phone"><b>CHF</b></div>
+  <div class="lines an" id="s7lines">
+    <span class="fit" data-w="960">Bezahlen</span>
+    <span class="fit" data-w="960">nur mit</span>
+    <span class="fit red" data-w="960">TWINT.</span>
+  </div>
+</section>
+
+<section class="scene" id="s8">
+  <div class="stack an">
+    <span class="fit" data-w="960" data-max="330">Jetzt</span>
+    <span class="fit" data-w="960">bestellen.</span>
+  </div>
+  <div class="url an" id="url"><span class="fit" data-w="888">retailshoplgll.ch</span></div>
+  <div class="meta sm" id="meta"><i></i>Nur Schweiz · Nur TWINT</div>
+  <div class="band b3"><div class="track"></div></div>
+</section>
+
+<canvas id="grain" width="1480" height="2320"></canvas>
+<div id="flash"></div>
+<div id="fade"></div>
+
+<script>
+  const FPS = 30, DURATION = 20;
+  const B = "../website/bilder/";
+  const PRODUKTE = [
+    { tag: "Unisex", name: "Langarmshirt Scream",       preis: "15", bild: "langarmshirt-scream-schwarz.jpg" },
+    { tag: "Schuhe", name: "Sneaker Street",            preis: "30", bild: "sneaker-bunt.jpg", ganz: true },
+    { tag: "Kinder", name: "Jogginghose Flower",        preis: "15", bild: "jogginghose-flower-hellgrau.jpg" },
+    { tag: "Schuhe", name: "Skate-Sneaker Rope",        preis: "35", bild: "skate-sneaker-schwarz.jpg", ganz: true },
+    { tag: "Kinder", name: "Langarmshirt Have passion", preis: "10", bild: "langarmshirt-have-passion.jpg" },
+    { tag: "Kinder", name: "Weite Hose Extraordinary",  preis: "10", bild: "hose-extraordinary-kinder.jpg" },
+  ];
+  const P0 = 3.2, PD = 0.95;                  // Produkte: Start, Dauer pro Produkt
+  const T = { s1: 0, s2: 2.0, s3: P0, s4: P0 + PRODUKTE.length * PD, w1: 0, w2: 0, w3: 0, s6: 0, s7: 0, s8: 0 };
+  T.w1 = T.s4 + 2.1; T.w2 = T.w1 + .6; T.w3 = T.w2 + .6; T.s6 = T.w3 + .6; T.s7 = T.s6 + 1.7; T.s8 = T.s7 + 1.6;
+  const CUTS = [T.s2, ...PRODUKTE.map((_, i) => P0 + i * PD), T.s4, T.w1, T.w2, T.w3, T.s6, T.s7];
+
+  const clamp = x => Math.min(1, Math.max(0, x));
+  const seg = (t, a, b) => clamp((t - a) / (b - a));
+  const eOut = x => x === 1 ? 1 : 1 - Math.pow(2, -10 * x);
+  const eBack = x => { const c = 1.9; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+  const eInOut = x => x < .5 ? 8 * x ** 4 : 1 - Math.pow(-2 * x + 2, 4) / 2;
+  const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  // Aufbau
+  $("#prods").innerHTML = PRODUKTE.map((p, i) => `
+    <section class="scene prod" id="p${i}">
+      ${p.ganz ? `<img class="bg" src="${B + p.bild}" alt="">` : ""}
+      <img class="fg${p.ganz ? " ganz" : ""}" src="${B + p.bild}" alt="">
+      <div class="shade"></div>
+      <div class="count sm">${String(i + 1).padStart(2, "0")} / ${String(PRODUKTE.length).padStart(2, "0")}</div>
+      <div class="tag sm">${p.tag}</div>
+      <div class="name">${p.name}</div>
+      <div class="price an">CHF ${p.preis}<em>.–</em></div>
+    </section>`).join("");
+  $("#grid").innerHTML = PRODUKTE.map(p => `<div class="tile"><img src="${B + p.bild}" alt=""></div>`).join("");
+  const bandText = {
+    b1: "Retail Shop LGLL — Neu im Shop — ",
+    b2: "Schuhe — Shirts — Hosen — Kinder — ",
+    b3: "retailshoplgll.ch — Nur Schweiz — Nur TWINT — ",
+  };
+  Object.entries(bandText).forEach(([k, txt]) => {
+    $(`.${k} .track`).innerHTML = Array.from({ length: 6 }, () => `<span class="seg">${txt}</span>`).join("");
+  });
+
+  // Körnung (einmal erzeugt, pro Bild verschoben)
+  (function grain() {
+    const c = $("#grain"), g = c.getContext("2d"), img = g.createImageData(c.width, c.height);
+    let s = 1234567;
+    for (let i = 0; i < img.data.length; i += 4) { s = (s * 1103515245 + 12345) & 0x7fffffff; const v = s % 256; img.data[i] = img.data[i + 1] = img.data[i + 2] = v; img.data[i + 3] = 255; }
+    g.putImageData(img, 0, 0);
+  })();
+
+  // Text auf Breite einpassen
+  function fitAll() {
+    // alle Szenen kurz sichtbar machen, damit Breiten gemessen werden können
+    $$(".scene").forEach(sc => { sc.dataset.d = sc.style.display; sc.style.display = "block"; });
+    $$(".fit").forEach(el => {
+      const target = +el.dataset.w; if (!target) return;
+      el.style.fontSize = "100px";
+      const w = el.getBoundingClientRect().width;
+      const max = +el.dataset.max || 9999;
+      el.style.fontSize = Math.min(max, 100 * target / w).toFixed(2) + "px";
+    });
+    measureBands();
+    $$(".scene").forEach(sc => { sc.style.display = sc.dataset.d; });
+  }
+  let segW = {};
+  function measureBands() { Object.keys(bandText).forEach(k => { segW[k] = $(`.${k} .seg`).getBoundingClientRect().width; }); }
+
+  function show(id, a, b) { const el = document.getElementById(id); el.style.display = (window.__t >= a && window.__t < b) ? "block" : "none"; return el; }
+  function slam(el, t, a, from = 1.35, dur = .32) {
+    const p = seg(t, a, a + dur);
+    el.style.opacity = p > 0 ? 1 : 0;
+    el.style.transform = `scale(${(from - (from - 1) * eOut(p)).toFixed(4)})`;
+    el.style.filter = p < 1 ? `blur(${((1 - eOut(p)) * 10).toFixed(2)}px)` : "none";
+  }
+  function band(k, t, speed, dir = 1) {
+    const x = ((t * speed) % segW[k]);
+    $(`.${k} .track`).style.transform = `translateX(${(dir > 0 ? -x : x - segW[k]).toFixed(2)}px)`;
+  }
+
+  function render(t) {
+    window.__t = t;
+    // Szenen ein/aus
+    show("s1", 0, T.s2 + .25);
+    show("s2", T.s2, P0);
+    PRODUKTE.forEach((_, i) => show("p" + i, P0 + i * PD, P0 + (i + 1) * PD));
+    show("s4", T.s4, T.w1);
+    show("w1", T.w1, T.w2); show("w2", T.w2, T.w3); show("w3", T.w3, T.s6);
+    show("s6", T.s6, T.s7); show("s7", T.s7, T.s8); show("s8", T.s8, 99);
+    // Reihenfolge der Ebenen
+    ["s1","s2",...PRODUKTE.map((_, i) => "p" + i),"s4","w1","w2","w3","s6","s7","s8"].forEach((id, i) => document.getElementById(id).style.zIndex = i + 1);
+
+    // 1 – Ansage: Wörter knallen rein, dann schiebt Rot von unten herein
+    $$("#s1 .fit").forEach((el, i) => slam(el, t, .15 + i * .3));
+    const s2in = eInOut(seg(t, T.s2 - .25, T.s2 + .05));
+    $("#s2").style.display = t >= T.s2 - .25 && t < P0 ? "block" : $("#s2").style.display;
+    $("#s2").style.clipPath = `inset(${((1 - s2in) * 100).toFixed(2)}% 0 0 0)`;
+    $("#s1 .stack").style.transform = `translateY(${(-s2in * 260).toFixed(1)}px)`;
+
+    // 2 – Marke
+    band("b1", t, 520, 1); band("b2", t, 520, -1);
+    slam($("#s2 .logo .fit"), t, T.s2 + .05, 1.5, .4);
+    $("#s2 .sub").style.opacity = eOut(seg(t, T.s2 + .35, T.s2 + .7));
+
+    // 3 – Produkte
+    PRODUKTE.forEach((_, i) => {
+      const a = P0 + i * PD, el = document.getElementById("p" + i);
+      $("img.fg", el).style.transform = `scale(${(1.16 - .1 * eOut(seg(t, a, a + PD))).toFixed(4)})`;
+      const nm = eOut(seg(t, a + .06, a + .36)), pr = eOut(seg(t, a + .12, a + .42));
+      $(".name", el).style.clipPath = `inset(0 ${((1 - nm) * 100).toFixed(2)}% 0 0)`;
+      $(".price", el).style.clipPath = `inset(0 ${((1 - pr) * 100).toFixed(2)}% 0 0)`;
+      $(".price", el).style.transform = `translateX(${((1 - pr) * -60).toFixed(1)}px)`;
+    });
+
+    // 4 – Raster + Sticker
+    $$("#s4 .tile").forEach((tile, i) => {
+      const p = seg(t, T.s4 + i * .07, T.s4 + i * .07 + .45);
+      tile.style.transform = `scale(${(.7 + .3 * eBack(p)).toFixed(4)})`;
+      tile.style.opacity = p > 0 ? 1 : 0;
+    });
+    const st = seg(t, T.s4 + .55, T.s4 + 1.0);
+    $("#sticker").style.transform = `scale(${(st === 0 ? 0 : eBack(st)).toFixed(4)}) rotate(${(-14 + Math.sin((t - T.s4) * 5) * 3).toFixed(2)}deg)`;
+
+    // 5 – Kategorien
+    ["w1", "w2", "w3"].forEach(id => {
+      const a = T[id], el = document.getElementById(id);
+      slam($(".fit", el), t, a, 1.25, .25);
+      $(".small", el).style.opacity = eOut(seg(t, a + .15, a + .4));
+    });
+
+    // 6 – Schweizer Kreuz wächst, dann Text
+    const cg = eOut(seg(t, T.s6, T.s6 + .45));
+    const cs = eInOut(seg(t, T.s6 + .55, T.s6 + .95));
+    const L = 640 * cg, W = 200 * cg;
+    const cross = $("#cross");
+    cross.style.transform = `translateY(${(-cs * 560).toFixed(1)}px) scale(${(1 - .55 * cs).toFixed(4)})`;
+    $("#cross .h").style.cssText = `width:${L}px;height:${W}px;left:${-L / 2}px;top:${-W / 2}px`;
+    $("#cross .v").style.cssText = `width:${W}px;height:${L}px;left:${-W / 2}px;top:${-L / 2}px`;
+    $$("#s6lines .fit").forEach((el, i) => slam(el, t, T.s6 + .7 + i * .16, 1.3, .3));
+
+    // 7 – TWINT
+    const ph = seg(t, T.s7, T.s7 + .4);
+    $("#phone").style.transform = `translateY(${((1 - eOut(ph)) * 120).toFixed(1)}px) rotate(${((1 - eOut(ph)) * -12).toFixed(2)}deg)`;
+    $("#phone").style.opacity = ph > 0 ? 1 : 0;
+    $$("#s7lines .fit").forEach((el, i) => slam(el, t, T.s7 + .25 + i * .16, 1.3, .3));
+
+    // 8 – Schluss: diagonaler Wisch, dann Text
+    const wp = eInOut(seg(t, T.s8 - .3, T.s8 + .05));
+    $("#s8").style.display = t >= T.s8 - .3 ? "block" : "none";
+    $("#s8").style.clipPath = `polygon(0 ${((1 - wp) * 130).toFixed(2)}%, 100% ${((1 - wp) * 130 - 30).toFixed(2)}%, 100% 100%, 0 100%)`;
+    $$("#s8 .stack .fit").forEach((el, i) => slam(el, t, T.s8 + .05 + i * .2, 1.3, .3));
+    const u = eOut(seg(t, T.s8 + .5, T.s8 + .85));
+    $("#url").style.clipPath = `inset(0 ${((1 - u) * 100).toFixed(2)}% 0 0)`;
+    $("#meta").style.opacity = eOut(seg(t, T.s8 + .8, T.s8 + 1.2));
+    band("b3", t, 300, 1);
+
+    // Blitz bei Schnitten, Körnung, Ausblenden
+    const fl = CUTS.some(c => t >= c && t < c + 1.5 / FPS);
+    $("#flash").style.opacity = fl ? .85 : 0;
+    const f = Math.floor(t * FPS);
+    $("#grain").style.transform = `translate(${-((f * 73) % 200)}px, ${-((f * 131) % 200)}px)`;
+    $("#fade").style.opacity = eInOut(seg(t, DURATION - .45, DURATION - .02)).toFixed(3);
+  }
+
+  window.render = render; window.FPS = FPS; window.DURATION = DURATION;
+  window.ready = Promise.all([
+    document.fonts.ready,
+    ...[...document.images].map(img => img.complete ? 0 : new Promise(r => { img.onload = img.onerror = r; })),
+  ]).then(() => Promise.all(["AN", "SM", "HG"].map(f => document.fonts.load(`80px ${f}`))))
+    .then(() => { fitAll(); render(0); });
+</script>
+</body>
+</html>

@@ -1,14 +1,16 @@
 // Rendert video.html Bild für Bild und erzeugt mit ffmpeg ein MP4.
-// Aufruf: node render.js [ausgabe.mp4]        Vorschau: node render.js --preview ordner t1 t2 ...
+// Aufruf: node render.js [--file video2.html] [ausgabe.mp4]    Vorschau: node render.js [--file …] --preview ordner t1 t2 ...
 const { chromium } = require('playwright');
 const { spawn } = require('child_process');
 const path = require('path');
 (async () => {
-  const args = process.argv.slice(2);
+  let args = process.argv.slice(2);
+  let file = 'video.html';
+  const fi = args.indexOf('--file'); if (fi >= 0) { file = args[fi + 1]; args.splice(fi, 2); }
   const b = await chromium.launch();
   const p = await b.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: 1 });
   const errs = []; p.on('pageerror', e => errs.push(e.message));
-  await p.goto('file://' + path.join(__dirname, 'video.html'));
+  await p.goto('file://' + path.join(__dirname, file));
   await p.evaluate(() => window.ready);
   if (args[0] === '--preview') {
     const dir = args[1];
