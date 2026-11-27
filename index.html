@@ -390,6 +390,7 @@
         <li><a href="#schuhe">Schuhe</a></li>
         <li><a href="#shirts">Shirts</a></li>
         <li><a href="#hosen">Hosen</a></li>
+        <li><a href="#caps">Caps</a></li>
         <li class="menu-sep"><a href="#ueber-uns">Über uns</a></li>
         <li><a href="#kontakt">Kontakt</a></li>
       </ul>
@@ -642,6 +643,37 @@
         groessen: ["9 J", "10 J", "11 J", "12 J", "14 J", "15 J"],
         bild: "bilder/jogginghose-flower-schwarz.jpg"
       },
+      {
+        name: "Snapback-Cap „LA Rose“",
+        typ: "Caps",
+        kategorie: "Unisex",
+        beschreibung: "Cap mit flachem Schirm, gestickter Rose und „LA“-Schriftzug vorne und seitlich.",
+        preis: "CHF 8.–",
+        farben: [
+          { name: "Schwarz",  farbe: "#111111" },
+          { name: "Rosa",     farbe: "#f4b6c8" },
+          { name: "Grün",     farbe: "#1e9e4a" },
+          { name: "Hellblau", farbe: "#9cc9ec" },
+          { name: "Rot",      farbe: "#c8102e" }
+        ],
+        hinweis: "Vorbestellung · Lieferung in 7–12 Werktagen · Bild zeigt Schwarz",
+        bild: "bilder/cap-la-rose-schwarz.jpg"
+      },
+      {
+        name: "Strickmütze „Graffiti“",
+        typ: "Caps",
+        kategorie: "Unisex",
+        beschreibung: "Warme Beanie mit grossem eingestricktem Graffiti-Schriftzug.",
+        preis: "CHF 5.–",
+        farben: [
+          { name: "Schwarz", farbe: "#111111" },
+          { name: "Weiss",   farbe: "#f4f2ec" },
+          { name: "Grau",    farbe: "#8e8e8e" },
+          { name: "Braun",   farbe: "#4a2c25" },
+          { name: "Rot",     farbe: "#c0262c" }
+        ],
+        bild: "bilder/muetze-graffiti.jpg"
+      },
     ];
 
     const EMAIL = "retailshoplgll@gmail.com";
@@ -803,7 +835,7 @@
     });
 
     // Kategorien (Schuhe / Shirts / Hosen)
-    const KATS = [["alle", "Alle"], ["schuhe", "Schuhe"], ["shirts", "Shirts"], ["hosen", "Hosen"], ["kinder", "Kinder"]];
+    const KATS = [["alle", "Alle"], ["schuhe", "Schuhe"], ["shirts", "Shirts"], ["hosen", "Hosen"], ["caps", "Caps & Mützen"], ["kinder", "Kinder"]];
     const passt = (p, kat) => kat === "alle" || (p.typ || "").toLowerCase() === kat || (kat === "kinder" && (p.kategorie || "").toLowerCase() === "kinder");
     const filterBox = document.getElementById("filters");
     if (produkte.length) {
@@ -826,13 +858,13 @@
     });
     function vonHash(scroll) {
       const h = location.hash.slice(1);
-      if (["schuhe", "shirts", "hosen"].includes(h)) {
+      if (["schuhe", "shirts", "hosen", "caps"].includes(h)) {
         zeigeKategorie(h);
         if (scroll) document.getElementById("produkte").scrollIntoView({ behavior: "smooth" });
       } else if (!h || h === "produkte") zeigeKategorie("alle");
     }
     window.addEventListener("hashchange", () => vonHash(true));
-    document.querySelectorAll('.menu a[href="#schuhe"], .menu a[href="#shirts"], .menu a[href="#hosen"]').forEach(a =>
+    document.querySelectorAll('.menu a[href="#schuhe"], .menu a[href="#shirts"], .menu a[href="#hosen"], .menu a[href="#caps"]').forEach(a =>
       a.addEventListener("click", () => { if (location.hash === a.getAttribute("href")) vonHash(true); }));
     vonHash(true);
 
