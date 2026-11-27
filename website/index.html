@@ -250,6 +250,10 @@
       background: conic-gradient(#e63946, #f4a261, #f9d423, #43aa8b, #3a86ff, #9b5de5, #e63946); }
     body.kids .kids-btn { background: var(--fg); color: var(--bg); }
     .burger { order: 4; }
+    .menu a { white-space: nowrap; }
+    @media (max-width: 1000px) and (min-width: 761px) {
+      .nav { gap: 16px; } .menu { gap: 16px; } .menu-sep { padding-left: 16px; } .menu a { font-size: 14px; }
+    }
     .kids-bg { position: fixed; inset: 0; z-index: -1; display: none;
       background: #4f9fe0 url(bilder/kinderwelt.jpg) center 75% / cover no-repeat; }
     body.kids { background: transparent; }
@@ -390,7 +394,7 @@
         <li><a href="#schuhe">Schuhe</a></li>
         <li><a href="#shirts">Shirts</a></li>
         <li><a href="#hosen">Hosen</a></li>
-        <li><a href="#caps">Caps</a></li>
+        <li><a href="#accessoires">Accessoires</a></li>
         <li class="menu-sep"><a href="#ueber-uns">Über uns</a></li>
         <li><a href="#kontakt">Kontakt</a></li>
       </ul>
@@ -447,6 +451,11 @@
             <span class="idx">B</span>
             <h3>Kleider</h3>
             <p>Kleider, die gut sitzen und sich gut anfühlen. Vom lässigen Alltagslook bis zum besonderen Auftritt.</p>
+          </li>
+          <li>
+            <span class="idx">C</span>
+            <h3>Accessoires</h3>
+            <p>Caps, Mützen und mehr. Die passenden Teile, die deinen Look fertig machen.</p>
           </li>
         </ul>
       </div>
@@ -645,7 +654,7 @@
       },
       {
         name: "Snapback-Cap „LA Rose“",
-        typ: "Caps",
+        typ: "Accessoires",
         kategorie: "Unisex",
         beschreibung: "Cap mit flachem Schirm, gestickter Rose und „LA“-Schriftzug vorne und seitlich.",
         preis: "CHF 8.–",
@@ -661,7 +670,7 @@
       },
       {
         name: "Strickmütze „Graffiti“",
-        typ: "Caps",
+        typ: "Accessoires",
         kategorie: "Unisex",
         beschreibung: "Warme Beanie mit grossem eingestricktem Graffiti-Schriftzug.",
         preis: "CHF 5.–",
@@ -835,7 +844,7 @@
     });
 
     // Kategorien (Schuhe / Shirts / Hosen)
-    const KATS = [["alle", "Alle"], ["schuhe", "Schuhe"], ["shirts", "Shirts"], ["hosen", "Hosen"], ["caps", "Caps & Mützen"], ["kinder", "Kinder"]];
+    const KATS = [["alle", "Alle"], ["schuhe", "Schuhe"], ["shirts", "Shirts"], ["hosen", "Hosen"], ["accessoires", "Accessoires"], ["kinder", "Kinder"]];
     const passt = (p, kat) => kat === "alle" || (p.typ || "").toLowerCase() === kat || (kat === "kinder" && (p.kategorie || "").toLowerCase() === "kinder");
     const filterBox = document.getElementById("filters");
     if (produkte.length) {
@@ -857,14 +866,15 @@
       try { history.replaceState(null, "", b.dataset.kat === "alle" ? "#produkte" : "#" + b.dataset.kat); } catch (_) {}
     });
     function vonHash(scroll) {
-      const h = location.hash.slice(1);
-      if (["schuhe", "shirts", "hosen", "caps"].includes(h)) {
+      const h0 = location.hash.slice(1);
+      const h = h0 === "caps" ? "accessoires" : h0;
+      if (["schuhe", "shirts", "hosen", "accessoires"].includes(h)) {
         zeigeKategorie(h);
         if (scroll) document.getElementById("produkte").scrollIntoView({ behavior: "smooth" });
       } else if (!h || h === "produkte") zeigeKategorie("alle");
     }
     window.addEventListener("hashchange", () => vonHash(true));
-    document.querySelectorAll('.menu a[href="#schuhe"], .menu a[href="#shirts"], .menu a[href="#hosen"], .menu a[href="#caps"]').forEach(a =>
+    document.querySelectorAll('.menu a[href="#schuhe"], .menu a[href="#shirts"], .menu a[href="#hosen"], .menu a[href="#accessoires"]').forEach(a =>
       a.addEventListener("click", () => { if (location.hash === a.getAttribute("href")) vonHash(true); }));
     vonHash(true);
 
