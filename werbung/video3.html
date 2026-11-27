@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Retail Shop LGLL – Werbevideo 3 (Handy-Tutorial)</title>
+<style>
+  /* Werbevideo 3: Handy-Tutorial, 1080×1920. Ein Handy zeigt die echte Website (Screenshots aus capture.js),
+     Schritt-Untertitel oben, Tipp-Kreise, Fortschrittsbalken. Alles hängt nur von t ab (render(t)). */
+  @font-face { font-family: "HG"; font-weight: 500; src: url(fonts/HankenGrotesk-500.ttf); }
+  @font-face { font-family: "HG"; font-weight: 600; src: url(fonts/HankenGrotesk-600.ttf); }
+  @font-face { font-family: "SM"; font-weight: 700; src: url(fonts/SpaceMono-Bold.ttf); }
+  @font-face { font-family: "IS"; src: url(fonts/InstrumentSerif-Regular.ttf); }
+  :root { --k: #0b0b0b; --w: #ffffff; --r: #d52b1e; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--k); font-family: "HG", sans-serif; }
+
+  .bg { position: absolute; inset: -120px; background-size: cover; background-position: center; filter: blur(46px) brightness(.5) saturate(1.1); opacity: 0; }
+  .vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 55%, rgba(0,0,0,0) 40%, rgba(0,0,0,.55) 100%); }
+
+  /* Fortschritt + Untertitel */
+  .progress { position: absolute; top: 96px; left: 70px; right: 70px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+  .progress i { height: 8px; border-radius: 4px; background: rgba(255,255,255,.28); overflow: hidden; position: relative; }
+  .progress i b { position: absolute; inset: 0; background: var(--w); transform-origin: left; transform: scaleX(0); }
+  .cap { position: absolute; top: 140px; left: 70px; right: 70px; height: 190px; }
+  .capitem { position: absolute; left: 0; top: 0; display: grid; gap: 16px; justify-items: start; }
+  .chip { font-family: "SM"; font-weight: 700; font-size: 28px; letter-spacing: .12em; text-transform: uppercase; background: var(--r); color: var(--w); padding: 8px 16px; }
+  .line { font-weight: 600; font-size: 66px; line-height: 1.05; color: var(--k); background: var(--w); padding: 10px 22px 14px; letter-spacing: -.01em; }
+
+  /* Handy */
+  .phone { position: absolute; left: 198px; top: 372px; width: 684px; height: 1430px; border-radius: 96px; background: #111; padding: 22px;
+           box-shadow: 0 0 0 3px #2a2a2a, 0 50px 120px rgba(0,0,0,.6); transform-origin: 50% 0; }
+  .screen { position: relative; width: 640px; height: 1386px; border-radius: 76px; overflow: hidden; background: #fff; }
+  .screen .s { position: absolute; left: 0; top: 104px; width: 640px; height: 1282px; overflow: hidden; display: none; will-change: transform, opacity; }
+  .status { position: absolute; left: 0; right: 0; top: 0; height: 104px; background: #fff; z-index: 30; display: flex; justify-content: space-between; align-items: center; padding: 18px 58px 0 70px; font-weight: 600; font-size: 30px; color: #000; }
+  .status .icons { display: flex; align-items: flex-end; gap: 5px; }
+  .status .icons i { width: 7px; background: #000; border-radius: 2px; display: block; }
+  .status .bat { width: 48px; height: 22px; border: 3px solid #000; border-radius: 7px; margin-left: 12px; position: relative; padding: 2px; }
+  .status .bat::before { content: ""; display: block; height: 100%; width: 75%; background: #000; border-radius: 2px; }
+  .screen .s img { width: 640px; display: block; }
+  .screen .long img.page { position: absolute; left: 0; top: 0; width: 640px; }
+  .screen .long img.head { position: absolute; left: 0; top: 0; width: 640px; z-index: 2; }
+  .island { position: absolute; left: 50%; top: 30px; width: 190px; height: 54px; margin-left: -95px; border-radius: 27px; background: #000; z-index: 31; }
+  .tap { position: absolute; width: 110px; height: 110px; margin: -55px 0 0 -55px; border-radius: 50%; z-index: 15; opacity: 0;
+         background: rgba(213,43,30,.35); border: 5px solid rgba(213,43,30,.9); }
+  .ring { position: absolute; width: 110px; height: 110px; margin: -55px 0 0 -55px; border-radius: 50%; border: 5px solid rgba(213,43,30,.8); z-index: 15; opacity: 0; }
+
+  /* TWINT-Anfrage (Benachrichtigung) */
+  .notif { position: absolute; left: 24px; right: 24px; top: 120px; z-index: 18; background: rgba(250,250,250,.97); border-radius: 36px; padding: 26px 28px;
+           box-shadow: 0 20px 50px rgba(0,0,0,.25); display: grid; grid-template-columns: 76px 1fr; gap: 20px; align-items: center; opacity: 0; }
+  .notif .ic { width: 76px; height: 76px; border-radius: 20px; background: var(--k); color: var(--w); display: grid; place-items: center; font-family: "SM"; font-weight: 700; font-size: 20px; letter-spacing: .02em; }
+  .notif .t1 { font-size: 26px; color: #666; font-weight: 500; }
+  .notif .t2 { font-size: 34px; font-weight: 600; color: var(--k); margin-top: 2px; }
+  .paid { position: absolute; inset: 0; z-index: 19; display: grid; place-items: center; background: rgba(255,255,255,.0); opacity: 0; }
+  .paid .badge { width: 300px; height: 300px; border-radius: 50%; background: #1f9d55; display: grid; place-items: center; box-shadow: 0 30px 70px rgba(0,0,0,.25); }
+  .paid svg { width: 150px; height: 150px; }
+  .paid .txt { position: absolute; top: calc(50% + 190px); font-size: 46px; font-weight: 600; color: var(--k); background: var(--w); padding: 10px 24px; border-radius: 12px; }
+
+  /* Schluss */
+  #end { position: absolute; inset: 0; background: var(--k); color: var(--w); z-index: 40; display: none; }
+  #end .k { position: absolute; left: 0; right: 0; text-align: center; }
+  #end .t1 { top: 470px; font-family: "SM"; font-weight: 700; font-size: 32px; letter-spacing: .3em; color: #9a9a9a; }
+  #end .t2 { top: 560px; font-family: "IS"; font-size: 190px; line-height: 1; letter-spacing: -.01em; }
+  #end .url { position: absolute; left: 50%; top: 860px; transform: translateX(-50%); background: var(--w); color: var(--k); font-weight: 600; font-size: 74px; padding: 22px 44px 28px; white-space: nowrap; }
+  #end .chips { position: absolute; left: 0; right: 0; top: 1080px; display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; padding: 0 90px; }
+  #end .chips span { font-family: "SM"; font-weight: 700; font-size: 30px; letter-spacing: .08em; text-transform: uppercase; border: 3px solid var(--w); padding: 14px 22px; }
+  #end .chips span.red { background: var(--r); border-color: var(--r); }
+  #end .team { top: 1290px; font-size: 36px; color: #bdbdbd; font-weight: 500; }
+  .mask { overflow: hidden; display: block; }
+  .mask > span { display: block; }
+  #fade { position: absolute; inset: 0; background: var(--k); opacity: 0; z-index: 60; }
+</style>
+</head>
+<body>
+<div id="bgs"></div>
+<div class="vignette"></div>
+
+<div class="progress" id="progress"><i><b></b></i><i><b></b></i><i><b></b></i><i><b></b></i><i><b></b></i></div>
+<div class="cap" id="cap"></div>
+
+<div class="phone" id="phone">
+  <div class="screen" id="screen">
+    <div class="status"><span>13:14</span><span class="icons"><i style="height:10px"></i><i style="height:15px"></i><i style="height:20px"></i><i style="height:25px"></i><span class="bat"></span></span></div>
+    <div class="island"></div>
+    <div class="s long" id="long"><img class="page" src="screens/02-lang.jpg" alt=""><img class="head" src="screens/02-header.png" alt=""></div>
+    <div class="notif" id="notif"><div class="ic">TWINT</div><div><div class="t1">Zahlungsanfrage · jetzt</div><div class="t2">CHF 30.– bestätigen?</div></div></div>
+    <div class="paid" id="paid"><div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path id="check" d="M5 12.5l4.5 4.5L19 7.5" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/></svg></div><div class="txt">Bezahlt mit TWINT</div></div>
+    <div class="tap" id="tap"></div><div class="ring" id="ring"></div>
+  </div>
+</div>
+
+<div id="end">
+  <div class="k t1"><span class="mask"><span>Jetzt bestellen auf</span></span></div>
+  <div class="k t2"><span class="mask"><span>Retail Shop</span></span></div>
+  <div class="url" id="url">retailshoplgll.ch</div>
+  <div class="chips" id="chips"><span>Ab CHF 5.–</span><span class="red">Nur Schweiz</span><span>Nur TWINT</span></div>
+  <div class="k team" id="team">Von Luis, Gabriel, Lamar und Lenox</div>
+</div>
+<div id="fade"></div>
+
+<script>
+  const FPS = 30, DURATION = 21.5;
+  const K = 640 / 390;                          // Website-Pixel → Handy-Pixel
+  const INFO = {"lang": {"height": 2770, "about": 646.28125, "produkte": 2570.140625}, "filterSchuhe": {"x": 124.1953125, "y": 355.2265625, "w": 81.703125, "h": 36.796875}, "farbe": {"x": 98, "y": 601.59375, "w": 28, "h": 28}, "groesse": {"x": 79, "y": 461.96875, "w": 38, "h": 33.1875}, "bestellen": {"x": 102, "y": 642.140625, "w": 172, "h": 44}, "abschicken": {"x": 195, "y": 749.828125, "w": 358, "h": 54}};  // aus screens/screens.json (node capture.js)
+  const B = "../website/bilder/";
+
+  // Hintergründe (unscharfe Produktfotos) je Abschnitt
+  const BGS = [
+    { t: 0,    img: "langarmshirt-scream-schwarz.jpg" },
+    { t: 2.6,  img: "jogginghose-flower-hellgrau.jpg" },
+    { t: 6.0,  img: "sneaker-schwarz.jpg" },
+    { t: 8.2,  img: "sneaker-bunt.jpg" },
+    { t: 11.6, img: "skate-sneaker-schwarz.jpg" },
+    { t: 14.6, img: "cap-la-rose-schwarz.jpg" },
+  ];
+  // Untertitel
+  const CAPS = [
+    { t: 0,    chip: "Retail Shop LGLL", line: "So einfach bestellst du" },
+    { t: 2.6,  chip: "Schritt 1", line: "Produkte anschauen" },
+    { t: 6.0,  chip: "Schritt 2", line: "Kategorie wählen" },
+    { t: 8.2,  chip: "Schritt 3", line: "Farbe & Grösse wählen" },
+    { t: 11.6, chip: "Schritt 4", line: "Adresse & Handynummer" },
+    { t: 14.6, chip: "Schritt 5", line: "Mit TWINT bezahlen" },
+  ];
+  const STEPS = [[2.6, 6.0], [6.0, 8.2], [8.2, 11.6], [11.6, 14.6], [14.6, 17.2]];
+  // Bildschirm-Zustände: Bild, Startzeit, Übergang
+  const SCREENS = [
+    { img: "01-start",       t: 0,     kind: "cut" },
+    { id: "long",            t: 2.6,   kind: "cut" },
+    { img: "03-produkte",    t: 5.75,  kind: "cut" },
+    { img: "04-schuhe",      t: 6.85,  kind: "fade" },
+    { img: "05-karte",       t: 8.2,   kind: "slide" },
+    { img: "06-farbe",       t: 8.95,  kind: "fade" },
+    { img: "07-vor-groesse", t: 9.7,   kind: "slide" },
+    { img: "08-groesse",     t: 10.5,  kind: "fade" },
+    { img: "09-kasse-leer",  t: 11.95, kind: "sheet" },
+    { img: "10-kasse-voll",  t: 12.8,  kind: "fade" },
+    { img: "11-kasse-unten", t: 13.75, kind: "slide" },
+    { img: "12-fertig",      t: 14.95, kind: "fade" },
+  ];
+  const TAPS = [
+    { t: 6.5,   at: INFO.filterSchuhe },
+    { t: 8.7,   at: INFO.farbe },
+    { t: 10.25, at: INFO.groesse },
+    { t: 11.7,  at: INFO.bestellen },
+    { t: 14.7,  at: INFO.abschicken },
+    { t: 16.15, at: { x: 195, y: 45 } },         // Tipp auf die TWINT-Anfrage
+  ];
+  const T_END = 17.2;
+
+  const clamp = x => Math.min(1, Math.max(0, x));
+  const seg = (t, a, b) => clamp((t - a) / (b - a));
+  const eOut = x => x === 1 ? 1 : 1 - Math.pow(2, -10 * x);
+  const eInOut = x => x < .5 ? 8 * x ** 4 : 1 - Math.pow(-2 * x + 2, 4) / 2;
+  const eBack = x => { const c = 1.7; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+  const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  // Aufbau
+  $("#bgs").innerHTML = BGS.map(b => `<div class="bg" style="background-image:url(${B + b.img})"></div>`).join("");
+  $("#cap").innerHTML = CAPS.map(c => `<div class="capitem"><span class="mask"><span class="chip">${c.chip}</span></span><span class="mask"><span class="line">${c.line}</span></span></div>`).join("");
+  const screen = $("#screen");
+  SCREENS.forEach((s, i) => {
+    if (s.id) { s.el = document.getElementById(s.id); }
+    else { const d = document.createElement("div"); d.className = "s"; d.innerHTML = `<img src="screens/${s.img}.jpg" alt="">`; screen.insertBefore(d, $("#notif")); s.el = d; }
+    s.el.style.zIndex = i + 1;
+  });
+
+  function render(t) {
+    // Hintergrund
+    $$(".bg").forEach((el, i) => {
+      const a = BGS[i].t, nb = BGS[i + 1] ? BGS[i + 1].t : 99;
+      const o = i === 0 ? 1 - seg(t, nb, nb + .6) : seg(t, a, a + .6) * (1 - seg(t, nb, nb + .6));
+      el.style.opacity = o.toFixed(3);
+      el.style.transform = `scale(${(1.05 + .06 * seg(t, a, a + 4)).toFixed(4)})`;
+    });
+
+    // Fortschritt
+    $$("#progress b").forEach((b, i) => { b.style.transform = `scaleX(${seg(t, STEPS[i][0], STEPS[i][1]).toFixed(4)})`; });
+    $("#progress").style.opacity = (seg(t, 2.3, 2.7) * (1 - seg(t, T_END - .2, T_END))).toFixed(3);
+
+    // Untertitel: rein von unten, raus nach oben
+    $$(".capitem").forEach((c, i) => {
+      const a = CAPS[i].t, nb = CAPS[i + 1] ? CAPS[i + 1].t : T_END;
+      const show = t >= a - .05 && t < nb + .4;
+      c.style.display = show ? "grid" : "none";
+      if (!show) return;
+      $$(".mask > span", c).forEach((s, k) => {
+        let y = (1 - eOut(seg(t, a + .05 + k * .08, a + .6 + k * .08))) * 115;
+        y -= eInOut(seg(t, nb - .25 + k * .04, nb + .1 + k * .04)) * 115;
+        s.style.transform = `translateY(${y.toFixed(2)}%)`;
+      });
+    });
+
+    // Handy: kommt von unten herein, am Schluss weg
+    const pin = eOut(seg(t, .1, 1.1));
+    const pout = eInOut(seg(t, T_END - .3, T_END + .3));
+    $("#phone").style.transform = `translateY(${((1 - pin) * 900 + pout * 300).toFixed(1)}px) scale(${(1 - pout * .15).toFixed(4)}) rotate(${((1 - pin) * 6).toFixed(2)}deg)`;
+
+    // Bildschirme
+    SCREENS.forEach((s, i) => {
+      const next = SCREENS[i + 1] ? SCREENS[i + 1].t : 99;
+      const vis = t >= s.t && t < next + .45;
+      s.el.style.display = vis ? "block" : "none";
+      if (!vis) return;
+      const p = s.kind === "cut" ? 1 : seg(t, s.t, s.t + (s.kind === "fade" ? .3 : .45));
+      if (s.kind === "fade") { s.el.style.opacity = p.toFixed(3); s.el.style.transform = "none"; }
+      else if (s.kind === "slide" || s.kind === "sheet") { s.el.style.opacity = 1; s.el.style.transform = `translateY(${((1 - eInOut(p)) * 100).toFixed(2)}%)`; }
+      else { s.el.style.opacity = 1; s.el.style.transform = "none"; }
+    });
+    // Lange Seite scrollen: bis „Über uns“, kurz halten, dann zu den Produkten
+    const L = INFO.lang;
+    const sc1 = (L.about - 80) * eInOut(seg(t, 2.8, 3.9));
+    const sc2 = (L.produkte - 72 - (L.about - 80)) * eInOut(seg(t, 4.6, 5.75));
+    $("#long .page").style.transform = `translateY(${(-(sc1 + sc2) * K).toFixed(1)}px)`;
+
+    // Tipp-Kreise
+    const tp = TAPS.find(x => t >= x.t - .15 && t < x.t + .55);
+    if (tp) {
+      const x = tp.at.x * K, y = tp.at.y * K + 104;
+      const a = seg(t, tp.t - .15, tp.t), r = seg(t, tp.t, tp.t + .5);
+      $("#tap").style.cssText = `left:${x}px;top:${y}px;opacity:${(a * (1 - r)).toFixed(3)};transform:scale(${(1.3 - .45 * a).toFixed(3)})`;
+      $("#ring").style.cssText = `left:${x}px;top:${y}px;opacity:${((r > 0 ? 1 : 0) * (1 - r)).toFixed(3)};transform:scale(${(1 + 1.2 * r).toFixed(3)})`;
+    } else { $("#tap").style.opacity = 0; $("#ring").style.opacity = 0; }
+
+    // TWINT-Anfrage + Bezahlt
+    const n = seg(t, 15.55, 16.0), nOut = seg(t, 16.35, 16.6);
+    $("#notif").style.opacity = (n > 0 ? 1 : 0) * (1 - nOut);
+    $("#notif").style.transform = `translateY(${((1 - eBack(n)) * -160).toFixed(1)}px) scale(${(1 - .05 * nOut).toFixed(3)})`;
+    const pd = seg(t, 16.45, 16.8);
+    $("#paid").style.opacity = pd.toFixed(3);
+    $("#paid").style.background = `rgba(255,255,255,${(.75 * pd).toFixed(3)})`;
+    $("#paid .badge").style.transform = `scale(${(pd === 0 ? .5 : .5 + .5 * eBack(pd)).toFixed(3)})`;
+    $("#check").style.strokeDashoffset = (1 - eOut(seg(t, 16.6, 17.0))).toFixed(3);
+
+    // Schluss
+    const ew = eInOut(seg(t, T_END - .1, T_END + .45));
+    $("#end").style.display = t >= T_END - .1 ? "block" : "none";
+    $("#end").style.clipPath = `inset(${((1 - ew) * 100).toFixed(2)}% 0 0 0)`;
+    $$("#end .mask > span").forEach((s, i) => { s.style.transform = `translateY(${((1 - eOut(seg(t, T_END + .35 + i * .12, T_END + 1.1 + i * .12))) * 115).toFixed(2)}%)`; });
+    const u = seg(t, T_END + .7, T_END + 1.2);
+    $("#url").style.transform = `translateX(-50%) scale(${(u === 0 ? .6 : .6 + .4 * eBack(u)).toFixed(3)})`;
+    $("#url").style.opacity = u > 0 ? 1 : 0;
+    $$("#chips span").forEach((c, i) => { const q = seg(t, T_END + 1.05 + i * .12, T_END + 1.45 + i * .12); c.style.opacity = q; c.style.transform = `translateY(${((1 - eOut(q)) * 30).toFixed(1)}px)`; });
+    $("#team").style.opacity = eOut(seg(t, T_END + 1.6, T_END + 2.1));
+    $("#fade").style.opacity = eInOut(seg(t, DURATION - .45, DURATION - .02)).toFixed(3);
+  }
+
+  window.render = render; window.FPS = FPS; window.DURATION = DURATION;
+  window.ready = Promise.all([
+    document.fonts.ready,
+    ...[...document.images].map(img => img.complete ? 0 : new Promise(r => { img.onload = img.onerror = r; })),
+    ...BGS.map(b => new Promise(r => { const im = new Image(); im.onload = im.onerror = r; im.src = B + b.img; })),
+  ]).then(() => Promise.all(["HG", "SM", "IS"].map(f => document.fonts.load(`80px ${f}`)))).then(() => render(0));
+</script>
+</body>
+</html>
